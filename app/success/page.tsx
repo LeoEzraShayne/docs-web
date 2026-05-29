@@ -10,14 +10,17 @@ export default function SuccessPage() {
   const [pendingProjectId, setPendingProjectId] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("pendingProjectId");
-    if (stored) {
+    queueMicrotask(() => {
+      const stored = sessionStorage.getItem("pendingProjectId");
+      if (!stored) {
+        return;
+      }
       setPendingProjectId(stored);
       void api
         .getProject(stored)
         .catch(() => null)
         .finally(() => sessionStorage.removeItem("pendingProjectId"));
-    }
+    });
   }, []);
 
   return (

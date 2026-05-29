@@ -39,11 +39,12 @@ export default function NewProjectPage() {
 
   async function handleExport(
     values: ProjectFormValues,
-    _quality: "standard" | "high",
+    quality: "standard" | "high",
   ) {
     try {
       setSubmitting(true);
       const created = await createProject(values);
+      void quality;
       const checkout = await api.checkoutOneshot();
       sessionStorage.setItem("pendingProjectId", created.id);
       window.location.href = checkout.url;

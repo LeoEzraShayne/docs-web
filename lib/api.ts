@@ -4,6 +4,10 @@ import type {
   AuthMeResponse,
   BillingSummary,
   GenerateResponse,
+  DocumentSummary,
+  DocumentType,
+  DocumentVersionResult,
+  GenerateDocumentPayload,
   ProjectDetail,
   ProjectFormValues,
   ProjectSummary,
@@ -64,6 +68,21 @@ export const api = {
   getProject: (id: string) => request<ProjectDetail>(`/projects/${id}`),
   getProjectVersion: (id: string, versionNo: number) =>
     request<ProjectVersionResponse>(`/projects/${id}/versions/${versionNo}`),
+  getDocuments: (projectId: string) =>
+    request<DocumentSummary[]>(`/projects/${projectId}/documents`),
+  getDocument: (projectId: string, type: DocumentType) =>
+    request<DocumentSummary>(`/projects/${projectId}/documents/${type}`),
+  generateDocument: (
+    projectId: string,
+    type: DocumentType,
+    payload: GenerateDocumentPayload,
+    idempotencyKey?: string,
+  ) =>
+    request<DocumentVersionResult>(`/projects/${projectId}/documents/${type}/generate`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
+    }),
   createProject: (values: ProjectFormValues) =>
     request<{ id: string; docTitle: string; updatedAt: string }>("/projects", {
       method: "POST",
@@ -110,6 +129,14 @@ export const api = {
     }),
   checkoutOneshot: () =>
     request<{ url: string }>("/billing/checkout/oneshot", { method: "POST" }),
+  checkoutSingleDocument: () =>
+    request<{ url: string }>("/billing/checkout/single-document", {
+      method: "POST",
+    }),
+  checkoutBusinessPack: () =>
+    request<{ url: string }>("/billing/checkout/business-pack", {
+      method: "POST",
+    }),
   checkoutSubscription: () =>
     request<{ url: string }>("/billing/checkout/subscription", {
       method: "POST",
@@ -122,6 +149,12 @@ export const api = {
     }),
   getDownloadUrl: (projectId: string, versionNo: number) =>
     `${API_BASE_URL}/projects/${projectId}/versions/${versionNo}/download`,
+  getDocumentDownloadUrl: (
+    projectId: string,
+    type: DocumentType,
+    versionNo: number,
+  ) =>
+    `${API_BASE_URL}/projects/${projectId}/documents/${type}/versions/${versionNo}/download`,
 };
 
 export function formatApiError(error: unknown) {

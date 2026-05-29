@@ -77,3 +77,49 @@ export type ProjectFormValues = {
   rolesText: string;
   minutesText: string;
 };
+
+export type DocumentType =
+  | "REQUIREMENTS"
+  | "BASIC_DESIGN"
+  | "DETAILED_DESIGN"
+  | "UNIT_TEST"
+  | "INTEGRATION_TEST";
+
+export type DocumentSourceType =
+  | "PROJECT"
+  | "REQUIREMENTS_VERSION"
+  | "BASIC_DESIGN_VERSION"
+  | "DETAILED_DESIGN_VERSION"
+  | "DIRECT_INPUT"
+  | "PASTED_DESIGN";
+
+export type DocumentSummary = {
+  id: string;
+  type: DocumentType;
+  title: string;
+  currentVersion: number;
+  grant?: {
+    remainingGenerations: number;
+    expiresAt: string;
+  };
+  versions: Array<{
+    id: string;
+    versionNo: number;
+    createdAt: string;
+  }>;
+};
+
+export type GenerateDocumentPayload = {
+  sourceType?: DocumentSourceType;
+  sourceDocumentVersionId?: string;
+  inputJson?: Record<string, unknown>;
+  selectedSheets?: string[];
+  quality?: "standard" | "high";
+};
+
+export type DocumentVersionResult = {
+  id: string;
+  versionNo: number;
+  createdAt: string;
+  tabs: Record<string, Array<Record<string, unknown>>>;
+};

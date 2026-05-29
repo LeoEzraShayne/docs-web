@@ -118,7 +118,7 @@ export function GoogleLoginButton({
         window.clearInterval(pollTimer);
       }
     };
-  }, []);
+  }, [onError]);
 
   useEffect(() => {
     if (!googleReady || !CLIENT_ID || !window.google || initializedRef.current) {

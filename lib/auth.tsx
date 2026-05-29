@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => void refresh());
   }, [refresh]);
 
   const value = useMemo(
