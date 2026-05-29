@@ -70,6 +70,8 @@ export const api = {
     request<ProjectVersionResponse>(`/projects/${id}/versions/${versionNo}`),
   getDocuments: (projectId: string) =>
     request<DocumentSummary[]>(`/projects/${projectId}/documents`),
+  getDocumentTree: (projectId: string) =>
+    request<DocumentSummary[]>(`/projects/${projectId}/documents/tree`),
   getDocument: (projectId: string, type: DocumentType) =>
     request<DocumentSummary>(`/projects/${projectId}/documents/${type}`),
   generateDocument: (

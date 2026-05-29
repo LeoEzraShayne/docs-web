@@ -113,13 +113,18 @@ export type GenerateDocumentPayload = {
   sourceType?: DocumentSourceType;
   sourceDocumentVersionId?: string;
   inputJson?: Record<string, unknown>;
+  generationMode?: "standard" | "simple" | "custom";
   selectedSheets?: string[];
+  testViewpoints?: string[];
   quality?: "standard" | "high";
 };
 
 export type DocumentVersionResult = {
+  document: DocumentSummary;
   id: string;
   versionNo: number;
   createdAt: string;
   tabs: Record<string, Array<Record<string, unknown>>>;
+  downloadUrl: string;
+  grant?: DocumentSummary["grant"];
 };
