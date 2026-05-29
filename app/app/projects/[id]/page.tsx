@@ -5,16 +5,22 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { DocumentTreePanel } from "@/components/documents/document-tree-panel";
 import { ProjectForm, mapProjectToForm } from "@/components/project-form";
 import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import type { ProjectDetail, ProjectFormValues } from "@/lib/types";
+import type {
+  DocumentSummary,
+  ProjectDetail,
+  ProjectFormValues,
+} from "@/lib/types";
 
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { billing } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number>(0);
@@ -23,8 +29,12 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     async function load() {
       try {
-        const response = await api.getProject(params.id);
+        const [response, tree] = await Promise.all([
+          api.getProject(params.id),
+          api.getDocumentTree(params.id),
+        ]);
         setProject(response);
+        setDocuments(tree);
       } catch (err) {
         setMessage(formatApiError(err).message);
       }
@@ -67,7 +77,9 @@ export default function ProjectDetailPage() {
           `preview:${params.id}:${response.versionNo}`,
           JSON.stringify(response),
         );
-        router.push(`/app/projects/${params.id}/preview?ver=${response.versionNo}`);
+        router.push(
+          `/app/projects/${params.id}/preview?ver=${response.versionNo}`,
+        );
         return;
       }
 
@@ -133,7 +145,9 @@ export default function ProjectDetailPage() {
             </Button>
           </div>
         </div>
-        {message ? <p className="mt-4 text-sm text-orange-300">{message}</p> : null}
+        {message ? (
+          <p className="mt-4 text-sm text-orange-300">{message}</p>
+        ) : null}
         <div className="mt-6">
           <ProjectForm
             initialValues={mapProjectToForm(project)}
@@ -150,6 +164,15 @@ export default function ProjectDetailPage() {
 
       <Card className="rounded-2xl p-6">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
+          Document Tree
+        </p>
+        <div className="mt-4">
+          <DocumentTreePanel projectId={params.id} documents={documents} />
+        </div>
+      </Card>
+
+      <Card className="rounded-2xl p-6">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
           Versions
         </p>
         <div className="mt-4 grid gap-3">
@@ -159,13 +182,17 @@ export default function ProjectDetailPage() {
               className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/50 p-4"
             >
               <div>
-                <p className="font-medium text-slate-100">Version {version.versionNo}</p>
+                <p className="font-medium text-slate-100">
+                  Version {version.versionNo}
+                </p>
                 <p className="text-sm text-slate-500">
                   {new Date(version.createdAt).toLocaleString("ja-JP")}
                 </p>
               </div>
               <div className="flex gap-2">
-                <Link href={`/app/projects/${params.id}/preview?ver=${version.versionNo}`}>
+                <Link
+                  href={`/app/projects/${params.id}/preview?ver=${version.versionNo}`}
+                >
                   <Button variant="secondary">Preview</Button>
                 </Link>
                 <a href={api.getDownloadUrl(params.id, version.versionNo)}>
@@ -175,7 +202,9 @@ export default function ProjectDetailPage() {
             </div>
           ))}
           {project.versions.length === 0 ? (
-            <p className="text-sm text-slate-500">まだバージョンはありません。</p>
+            <p className="text-sm text-slate-500">
+              まだバージョンはありません。
+            </p>
           ) : null}
         </div>
       </Card>
