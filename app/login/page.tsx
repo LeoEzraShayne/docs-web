@@ -101,7 +101,7 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-[430px] items-center justify-center py-8">
+    <div className="mx-auto flex min-h-[70vh] max-w-[470px] items-center justify-center py-8">
       <div className="panel w-full rounded-[28px] p-6 md:p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="opacity-90">
@@ -142,7 +142,7 @@ function LoginPageContent() {
                 className="h-[40px] w-full rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
               />
 
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-2">
                 <input
                   type="text"
                   placeholder="6桁の認証コードを入力"
@@ -152,7 +152,7 @@ function LoginPageContent() {
                   className="h-[40px] min-w-0 flex-1 rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
                 />
                 <Button
-                  className="h-[40px] w-full shrink-0 rounded-xl text-sm sm:w-[148px]"
+                  className="h-[40px] w-full shrink-0 rounded-xl text-sm sm:w-[132px]"
                   disabled={loading || !email || cooldown > 0}
                   onClick={() => void startEmailLogin()}
                 >
