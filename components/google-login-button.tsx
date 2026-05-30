@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -42,8 +42,9 @@ export function GoogleLoginButton({
   const [googleReady, setGoogleReady] = useState(false);
   const [buttonRendered, setButtonRendered] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const elementId = useId().replace(/:/g, "");
   const initializedRef = useRef(false);
+  const buttonContainerRef = useRef<HTMLDivElement | null>(null);
+  const renderedWidthRef = useRef(0);
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -149,14 +150,34 @@ export function GoogleLoginButton({
         }
       },
     });
+  }, [googleReady, onError, redirectTo, refresh, router]);
 
-    const target = document.getElementById(elementId);
-    if (target) {
+  useEffect(() => {
+    if (!googleReady || !CLIENT_ID || !window.google) {
+      return;
+    }
+
+    const google = window.google;
+    const target = buttonContainerRef.current;
+    if (!target) {
+      return;
+    }
+
+    const renderGoogleButton = () => {
+      const availableWidth = Math.floor(target.getBoundingClientRect().width);
+      const buttonWidth = Math.min(400, Math.max(240, availableWidth || 360));
+
+      if (renderedWidthRef.current === buttonWidth) {
+        return;
+      }
+
+      renderedWidthRef.current = buttonWidth;
+      setButtonRendered(false);
       target.innerHTML = "";
-      window.google.accounts.id.renderButton(target, {
+      google.accounts.id.renderButton(target, {
         theme: "filled_black",
         size: "large",
-        width: 360,
+        width: buttonWidth,
         text: "continue_with",
         shape: "rectangular",
       });
@@ -165,8 +186,21 @@ export function GoogleLoginButton({
           target.childElementCount > 0 || target.querySelector("iframe");
         setButtonRendered(Boolean(hasGoogleDom));
       }, 80);
-    }
-  }, [elementId, googleReady, onError, redirectTo, refresh, router]);
+    };
+
+    renderGoogleButton();
+
+    const resizeObserver = new ResizeObserver(() => {
+      renderGoogleButton();
+    });
+    resizeObserver.observe(target);
+
+    return () => {
+      resizeObserver.disconnect();
+      renderedWidthRef.current = 0;
+      target.innerHTML = "";
+    };
+  }, [googleReady]);
 
   return (
     <div className="space-y-2">
@@ -186,7 +220,7 @@ export function GoogleLoginButton({
         </Button>
       ) : null}
       <div
-        id={elementId}
+        ref={buttonContainerRef}
         className={`${googleReady ? "google-button-shell" : "hidden"}`}
       />
       {submitting ? (

@@ -86,12 +86,17 @@ a {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  min-width: 0;
   overflow: visible;
 }
 
-.google-button-shell > div,
+.google-button-shell > div {
+  width: 100%;
+}
+
 .google-button-shell iframe {
-  max-width: 100%;
+  display: block;
+  width: 100% !important;
 }
 
 .watermark::after {
