@@ -142,17 +142,17 @@ function LoginPageContent() {
                 className="h-[40px] w-full rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
               />
 
-              <div className="grid gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <input
                   type="text"
                   placeholder="6桁の認証コードを入力"
                   ref={codeInputRef}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
-                  className="h-[40px] w-full rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
+                  className="h-[40px] min-w-0 flex-1 rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
                 />
                 <Button
-                  className="h-[40px] w-full rounded-xl text-sm"
+                  className="h-[40px] w-full shrink-0 rounded-xl text-sm sm:w-[148px]"
                   disabled={loading || !email || cooldown > 0}
                   onClick={() => void startEmailLogin()}
                 >
