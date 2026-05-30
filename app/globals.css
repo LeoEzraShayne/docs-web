@@ -89,15 +89,18 @@ a {
   min-height: 52px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #202124;
+  padding-right: 36px;
 }
 
 .google-button-shell > div {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   overflow: visible;
 }
 

@@ -169,7 +169,13 @@ export function GoogleLoginButton({
     }
 
     const renderGoogleButton = () => {
-      const availableWidth = Math.floor(target.getBoundingClientRect().width);
+      const styles = window.getComputedStyle(target);
+      const horizontalPadding =
+        Number.parseFloat(styles.paddingLeft) +
+        Number.parseFloat(styles.paddingRight);
+      const availableWidth = Math.floor(
+        target.getBoundingClientRect().width - horizontalPadding,
+      );
       const buttonWidth = Math.min(400, Math.max(240, availableWidth || 360));
 
       if (renderedWidthRef.current === buttonWidth) {
