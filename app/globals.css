@@ -62,7 +62,11 @@ a {
 
 .panel {
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(17, 26, 46, 0.95), rgba(9, 16, 29, 0.95));
+  background: linear-gradient(
+    180deg,
+    rgba(17, 26, 46, 0.95),
+    rgba(9, 16, 29, 0.95)
+  );
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.3);
 }
 
@@ -85,18 +89,21 @@ a {
   min-height: 52px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-width: 0;
   overflow: visible;
 }
 
 .google-button-shell > div {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: visible;
 }
 
 .google-button-shell iframe {
   display: block;
-  width: 100% !important;
+  max-width: 100%;
 }
 
 .watermark::after {

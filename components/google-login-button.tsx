@@ -76,7 +76,8 @@ export function GoogleLoginButton({
 
     const markError = () => {
       if (!cancelled) {
-        const message = "Google 登录按钮加载失败，请刷新页面或使用邮箱验证码登录。";
+        const message =
+          "Google 登录按钮加载失败，请刷新页面或使用邮箱验证码登录。";
         setError(message);
         onError?.(message);
       }
@@ -122,7 +123,12 @@ export function GoogleLoginButton({
   }, [onError]);
 
   useEffect(() => {
-    if (!googleReady || !CLIENT_ID || !window.google || initializedRef.current) {
+    if (
+      !googleReady ||
+      !CLIENT_ID ||
+      !window.google ||
+      initializedRef.current
+    ) {
       return;
     }
 
@@ -139,10 +145,9 @@ export function GoogleLoginButton({
           router.replace(redirectTo);
         } catch (err) {
           const formatted = formatApiError(err);
-          const message =
-            formatted.requestId
-              ? `${formatted.message} | Request ID: ${formatted.requestId}`
-              : formatted.message;
+          const message = formatted.requestId
+            ? `${formatted.message} | Request ID: ${formatted.requestId}`
+            : formatted.message;
           setError(message);
           onError?.(message);
         } finally {
@@ -180,6 +185,7 @@ export function GoogleLoginButton({
         width: buttonWidth,
         text: "continue_with",
         shape: "rectangular",
+        logo_alignment: "left",
       });
       window.setTimeout(() => {
         const hasGoogleDom =
@@ -216,7 +222,9 @@ export function GoogleLoginButton({
                 : "flex h-12 w-full justify-center rounded-lg border-slate-700 bg-slate-900/80 text-slate-300 hover:bg-slate-900/80"
           }
         >
-          {error ? "Google ログインは現在利用できません" : "Google ログインを読み込み中..."}
+          {error
+            ? "Google ログインは現在利用できません"
+            : "Google ログインを読み込み中..."}
         </Button>
       ) : null}
       <div
@@ -224,12 +232,24 @@ export function GoogleLoginButton({
         className={`${googleReady ? "google-button-shell" : "hidden"}`}
       />
       {submitting ? (
-        <p className={surface === "light" ? "text-sm text-zinc-700" : "text-sm text-amber-200"}>
+        <p
+          className={
+            surface === "light"
+              ? "text-sm text-zinc-700"
+              : "text-sm text-amber-200"
+          }
+        >
           Google アカウントを確認しています...
         </p>
       ) : null}
       {error ? (
-        <p className={surface === "light" ? "text-sm text-red-600" : "text-sm text-orange-300"}>
+        <p
+          className={
+            surface === "light"
+              ? "text-sm text-red-600"
+              : "text-sm text-orange-300"
+          }
+        >
           {error}
         </p>
       ) : null}
