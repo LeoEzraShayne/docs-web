@@ -94,7 +94,7 @@ export type DocumentSourceType =
   | "PASTED_DESIGN";
 
 export type DocumentSummary = {
-  id: string;
+  id: string | null;
   type: DocumentType;
   title: string;
   currentVersion: number;

@@ -37,6 +37,18 @@ async function mockApi(
       json: { planType: "ONESHOT", remaining: 10, periodEnd: null },
     }),
   );
+  await page.route(`${API}/projects`, (route) =>
+    route.fulfill({
+      json: [
+        {
+          id: "project-1",
+          docTitle: "テスト案件",
+          updatedAt: "2026-05-30T00:00:00.000Z",
+          status: "READY",
+        },
+      ],
+    }),
+  );
   await page.route(`${API}/projects/project-1`, (route) =>
     route.fulfill({
       json: {
@@ -110,6 +122,33 @@ test("opens all five document pages", async ({ page }) => {
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
     await expect(page.getByText("標準版（推奨）")).toBeVisible();
   }
+});
+
+test("shows workspace project document tree navigation", async ({ page }) => {
+  await page.goto("/app/projects/project-1/documents/requirements?version=v1");
+
+  await expect(page.getByText("新規案件")).toBeVisible();
+  await expect(page.getByText("案件一覧")).toBeVisible();
+  await expect(page.getByText("アカウント")).toBeVisible();
+  await expect(page.getByText("Projects", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "テスト案件" })).toBeVisible();
+
+  for (const label of [
+    "要件定義書",
+    "基本設計書",
+    "詳細設計書",
+    "単体テスト仕様書",
+    "結合テスト仕様書",
+  ]) {
+    await expect(page.getByRole("link", { name: label })).toBeVisible();
+  }
+
+  const version = page.getByRole("link", { name: "v1" }).first();
+  await expect(version).toHaveAttribute(
+    "href",
+    /\/app\/projects\/project-1\/documents\/requirements\?version=v1$/,
+  );
+  await expect(version).toHaveClass(/text-amber-200/);
 });
 
 test("shows and hides source-specific fields", async ({ page }) => {

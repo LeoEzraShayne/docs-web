@@ -18,6 +18,7 @@ import {
   type GenerationMode,
 } from "@/lib/document-configs";
 import { api, formatApiError } from "@/lib/api";
+import { notifyWorkspaceTreeRefresh } from "@/lib/workspace-events";
 import type {
   DocumentSourceType,
   DocumentSummary,
@@ -131,6 +132,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
       setStatus(config.progress.at(-1) ?? "完了しました");
       setPercent(100);
       await load();
+      notifyWorkspaceTreeRefresh({ projectId: params.id });
       const downloadUrl = api.getDocumentDownloadUrl(
         params.id,
         type,
