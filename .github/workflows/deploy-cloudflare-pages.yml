@@ -29,7 +29,7 @@ jobs:
         run: npx @cloudflare/next-on-pages@1.13.16
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy .vercel/output/static --project-name=docs-web --branch=main
+        run: npx wrangler pages deploy .vercel/output/static --project-name=docs --branch=main
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
