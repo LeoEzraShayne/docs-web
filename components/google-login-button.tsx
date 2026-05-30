@@ -44,6 +44,7 @@ export function GoogleLoginButton({
   const [submitting, setSubmitting] = useState(false);
   const initializedRef = useRef(false);
   const buttonContainerRef = useRef<HTMLDivElement | null>(null);
+  const buttonShellRef = useRef<HTMLDivElement | null>(null);
   const renderedWidthRef = useRef(0);
   const router = useRouter();
   const { refresh } = useAuth();
@@ -164,18 +165,13 @@ export function GoogleLoginButton({
 
     const google = window.google;
     const target = buttonContainerRef.current;
-    if (!target) {
+    const shell = buttonShellRef.current;
+    if (!target || !shell) {
       return;
     }
 
     const renderGoogleButton = () => {
-      const styles = window.getComputedStyle(target);
-      const horizontalPadding =
-        Number.parseFloat(styles.paddingLeft) +
-        Number.parseFloat(styles.paddingRight);
-      const availableWidth = Math.floor(
-        target.getBoundingClientRect().width - horizontalPadding,
-      );
+      const availableWidth = Math.floor(shell.getBoundingClientRect().width);
       const buttonWidth = Math.min(400, Math.max(240, availableWidth || 360));
 
       if (renderedWidthRef.current === buttonWidth) {
@@ -205,7 +201,7 @@ export function GoogleLoginButton({
     const resizeObserver = new ResizeObserver(() => {
       renderGoogleButton();
     });
-    resizeObserver.observe(target);
+    resizeObserver.observe(shell);
 
     return () => {
       resizeObserver.disconnect();
@@ -234,9 +230,19 @@ export function GoogleLoginButton({
         </Button>
       ) : null}
       <div
-        ref={buttonContainerRef}
-        className={`${googleReady ? "google-button-shell" : "hidden"}`}
-      />
+        ref={buttonShellRef}
+        className={`${googleReady ? "google-login-button" : "hidden"}`}
+      >
+        <div className="google-login-visual">
+          <span className="google-login-avatar">G</span>
+          <span className="google-login-text">Google で続ける</span>
+        </div>
+        <div
+          ref={buttonContainerRef}
+          aria-label="Google で続ける"
+          className="google-button-hitbox"
+        />
+      </div>
       {submitting ? (
         <p
           className={
