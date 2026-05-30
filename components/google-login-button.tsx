@@ -15,10 +15,7 @@ declare global {
             client_id: string;
             callback: (response: { credential: string }) => void;
           }) => void;
-          renderButton: (
-            element: HTMLElement,
-            options: Record<string, unknown>,
-          ) => void;
+          prompt: () => void;
         };
       };
     };
@@ -40,12 +37,8 @@ export function GoogleLoginButton({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
-  const [buttonRendered, setButtonRendered] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const initializedRef = useRef(false);
-  const buttonContainerRef = useRef<HTMLDivElement | null>(null);
-  const buttonShellRef = useRef<HTMLDivElement | null>(null);
-  const renderedWidthRef = useRef(0);
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -158,61 +151,23 @@ export function GoogleLoginButton({
     });
   }, [googleReady, onError, redirectTo, refresh, router]);
 
-  useEffect(() => {
-    if (!googleReady || !CLIENT_ID || !window.google) {
+  const handleGoogleLogin = () => {
+    if (!window.google) {
+      const message =
+        "Google 登录按钮加载失败，请刷新页面或使用邮箱验证码登录。";
+      setError(message);
+      onError?.(message);
       return;
     }
 
-    const google = window.google;
-    const target = buttonContainerRef.current;
-    const shell = buttonShellRef.current;
-    if (!target || !shell) {
-      return;
-    }
-
-    const renderGoogleButton = () => {
-      const availableWidth = Math.floor(shell.getBoundingClientRect().width);
-      const buttonWidth = Math.min(400, Math.max(240, availableWidth || 360));
-
-      if (renderedWidthRef.current === buttonWidth) {
-        return;
-      }
-
-      renderedWidthRef.current = buttonWidth;
-      setButtonRendered(false);
-      target.innerHTML = "";
-      google.accounts.id.renderButton(target, {
-        theme: "filled_black",
-        size: "large",
-        width: buttonWidth,
-        text: "continue_with",
-        shape: "rectangular",
-        logo_alignment: "left",
-      });
-      window.setTimeout(() => {
-        const hasGoogleDom =
-          target.childElementCount > 0 || target.querySelector("iframe");
-        setButtonRendered(Boolean(hasGoogleDom));
-      }, 80);
-    };
-
-    renderGoogleButton();
-
-    const resizeObserver = new ResizeObserver(() => {
-      renderGoogleButton();
-    });
-    resizeObserver.observe(shell);
-
-    return () => {
-      resizeObserver.disconnect();
-      renderedWidthRef.current = 0;
-      target.innerHTML = "";
-    };
-  }, [googleReady]);
+    setError(null);
+    onError?.(null);
+    window.google.accounts.id.prompt();
+  };
 
   return (
     <div className="space-y-2">
-      {!buttonRendered ? (
+      {!googleReady ? (
         <Button
           type="button"
           disabled
@@ -229,20 +184,17 @@ export function GoogleLoginButton({
             : "Google ログインを読み込み中..."}
         </Button>
       ) : null}
-      <div
-        ref={buttonShellRef}
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        disabled={!googleReady || submitting}
         className={`${googleReady ? "google-login-button" : "hidden"}`}
       >
         <div className="google-login-visual">
           <span className="google-login-avatar">G</span>
           <span className="google-login-text">Google で続ける</span>
         </div>
-        <div
-          ref={buttonContainerRef}
-          aria-label="Google で続ける"
-          className="google-button-hitbox"
-        />
-      </div>
+      </button>
       {submitting ? (
         <p
           className={
