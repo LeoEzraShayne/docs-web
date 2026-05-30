@@ -18,7 +18,6 @@ function LoginPageContent() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const [googleError, setGoogleError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const codeInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -127,9 +126,7 @@ function LoginPageContent() {
             <GoogleLoginButton
               redirectTo={next}
               compact
-              onError={setGoogleError}
             />
-            {googleError ? <p className="text-sm text-orange-300">{googleError}</p> : null}
 
             <div className="flex items-center gap-4">
               <div className="h-px flex-1 bg-slate-800" />
