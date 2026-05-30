@@ -23,7 +23,10 @@ function node(type: string, title: string, versionId?: string) {
   };
 }
 
-async function mockApi(page: Page) {
+async function mockApi(
+  page: Page,
+  options: { failGenerate?: boolean; treeRequests?: string[] } = {},
+) {
   await page.route(`${API}/auth/me`, (route) =>
     route.fulfill({
       json: { user: { id: "user-1", email: "test@example.com" } },
@@ -45,24 +48,35 @@ async function mockApi(page: Page) {
       },
     }),
   );
-  await page.route(`${API}/projects/project-1/documents/tree`, (route) =>
-    route.fulfill({ json: documents }),
-  );
-  await page.route(`${API}/projects/project-1/documents/**/generate`, (route) =>
-    route.fulfill({
-      json: {
-        id: "new-version",
-        versionNo: 2,
-        createdAt: "2026-05-30T00:00:00.000Z",
-        tabs: {},
-        document: documents[0],
-        downloadUrl: "/download",
-        grant: {
-          remainingGenerations: 1,
-          expiresAt: "2026-06-06T00:00:00.000Z",
+  await page.route(`${API}/projects/project-1/documents/tree`, (route) => {
+    options.treeRequests?.push("tree");
+    return route.fulfill({ json: documents });
+  });
+  await page.route(
+    `${API}/projects/project-1/documents/**/generate`,
+    (route) => {
+      if (options.failGenerate) {
+        return route.fulfill({
+          status: 503,
+          headers: { "x-request-id": "req-failed" },
+          json: { message: "LLM unavailable", requestId: "req-failed" },
+        });
+      }
+      return route.fulfill({
+        json: {
+          id: "new-version",
+          versionNo: 2,
+          createdAt: "2026-05-30T00:00:00.000Z",
+          tabs: {},
+          document: documents[0],
+          downloadUrl: "/download",
+          grant: {
+            remainingGenerations: 1,
+            expiresAt: "2026-06-06T00:00:00.000Z",
+          },
         },
-      },
-    }),
+      });
+    },
   );
   await page.route(`${API}/projects/project-1/documents/**/download`, (route) =>
     route.fulfill({
@@ -123,6 +137,11 @@ test("shows and hides source-specific fields", async ({ page }) => {
 test("generates, keeps success state, and refreshes versions", async ({
   page,
 }) => {
+  const treeRequests: string[] = [];
+  await page.unroute(`${API}/projects/project-1/documents/tree`);
+  await page.unroute(`${API}/projects/project-1/documents/**/generate`);
+  await mockApi(page, { treeRequests });
+
   await page.goto("/app/projects/project-1/documents/requirements");
   await page.getByLabel("解決したい課題").fill("課題");
   await page.getByLabel("実現したいこと").fill("目標");
@@ -134,5 +153,51 @@ test("generates, keeps success state, and refreshes versions", async ({
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "再ダウンロード" }).first(),
+  ).toBeVisible();
+  await expect.poll(() => treeRequests.length).toBeGreaterThan(1);
+});
+
+test("validates custom sheet selection before generation", async ({ page }) => {
+  await page.goto("/app/projects/project-1/documents/requirements");
+  await page.getByLabel("解決したい課題").fill("課題");
+  await page.getByLabel("実現したいこと").fill("目標");
+  await page.getByLabel("主な機能").fill("機能");
+  await page.getByLabel("カスタム").check();
+
+  for (const label of ["項目概要", "スコープ定義", "業務要件"]) {
+    await page.getByLabel(label).uncheck();
+  }
+  for (const label of [
+    "機能要件一覧",
+    "画面一覧",
+    "画面概要",
+    "権限一覧",
+    "データ項目定義",
+    "外部連携/API一覧",
+    "非機能要件",
+    "業務フロー",
+    "課題・リスク一覧",
+  ]) {
+    await page.getByLabel(label).uncheck();
+  }
+
+  await page.getByRole("button", { name: "要件定義書を生成する" }).click();
+  await expect(
+    page.getByText("少なくとも1つのシートを選択してください。"),
+  ).toBeVisible();
+});
+
+test("shows API errors with request id", async ({ page }) => {
+  await page.unroute(`${API}/projects/project-1/documents/**/generate`);
+  await mockApi(page, { failGenerate: true });
+
+  await page.goto("/app/projects/project-1/documents/requirements");
+  await page.getByLabel("解決したい課題").fill("課題");
+  await page.getByLabel("実現したいこと").fill("目標");
+  await page.getByLabel("主な機能").fill("機能");
+  await page.getByRole("button", { name: "要件定義書を生成する" }).click();
+
+  await expect(
+    page.getByText("LLM unavailable | Request ID: req-failed"),
   ).toBeVisible();
 });

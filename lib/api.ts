@@ -36,11 +36,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const payload = await response
       .json()
       .catch(() => ({ message: response.statusText }));
-    const error = new Error(
-      payload?.message ?? "Request failed",
-    ) as ApiError;
+    const error = new Error(payload?.message ?? "Request failed") as ApiError;
     error.status = response.status;
-    error.requestId = response.headers.get("x-request-id") ?? undefined;
+    error.requestId =
+      response.headers.get("x-request-id") ?? payload?.requestId ?? undefined;
     throw error;
   }
 
@@ -80,11 +79,14 @@ export const api = {
     payload: GenerateDocumentPayload,
     idempotencyKey?: string,
   ) =>
-    request<DocumentVersionResult>(`/projects/${projectId}/documents/${type}/generate`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
-    }),
+    request<DocumentVersionResult>(
+      `/projects/${projectId}/documents/${type}/generate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
+      },
+    ),
   createProject: (values: ProjectFormValues) =>
     request<{ id: string; docTitle: string; updatedAt: string }>("/projects", {
       method: "POST",

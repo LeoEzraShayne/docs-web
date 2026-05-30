@@ -42,6 +42,7 @@ test("routes each paid plan to its checkout API", async ({ page }) => {
   await page.goto("/pricing");
   await page.getByRole("button", { name: "購入する" }).first().click();
   await expect.poll(() => requests).toContainEqual("single");
+  await page.waitForURL("**/success");
   await page.goto("/pricing");
   await page.getByRole("button", { name: "購入する" }).nth(1).click();
   await expect.poll(() => requests).toContainEqual("business");
