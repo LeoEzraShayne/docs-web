@@ -123,14 +123,13 @@ function LoginPageContent() {
           </div>
 
           <div className="space-y-4">
-            <GoogleLoginButton
-              redirectTo={next}
-              compact
-            />
+            <GoogleLoginButton redirectTo={next} compact />
 
             <div className="flex items-center gap-4">
               <div className="h-px flex-1 bg-slate-800" />
-              <span className="text-sm tracking-[0.24em] text-slate-500">または</span>
+              <span className="text-sm tracking-[0.24em] text-slate-500">
+                または
+              </span>
               <div className="h-px flex-1 bg-slate-800" />
             </div>
 
@@ -143,7 +142,7 @@ function LoginPageContent() {
                 className="h-[40px] w-full rounded-xl border border-slate-430 bg-slate-950/70 px-5 text-base text-slate-100 transition placeholder:text-slate-500 focus:border-amber-400/70"
               />
 
-              <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_130px]">
+              <div className="grid gap-3">
                 <input
                   type="text"
                   placeholder="6桁の認証コードを入力"
@@ -168,7 +167,9 @@ function LoginPageContent() {
                 認証してログイン
               </Button>
 
-              {emailError ? <p className="text-sm text-orange-300">{emailError}</p> : null}
+              {emailError ? (
+                <p className="text-sm text-orange-300">{emailError}</p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -179,7 +180,11 @@ function LoginPageContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="py-8 text-sm text-slate-400">読み込み中...</div>}>
+    <Suspense
+      fallback={
+        <div className="py-8 text-sm text-slate-400">読み込み中...</div>
+      }
+    >
       <LoginPageContent />
     </Suspense>
   );
