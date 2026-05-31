@@ -2,29 +2,39 @@ import Link from "next/link";
 import { Card } from "@/components/card";
 import { Button } from "@/components/button";
 import { SectionTitle } from "@/components/section-title";
+import { JsonLd } from "@/components/seo/json-ld";
+import {
+  softwareApplicationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 
 const highlights = [
-  "Google ログイン + メール認証",
-  "議事録から多シート要件定義を自動整理",
-  "プレビュー確認後に Excel ダウンロード",
+  "要件定義書・設計書・テスト仕様書に対応",
+  "プレビュー確認後にExcel出力",
+  "再生成と履歴管理でレビューを進めやすく",
 ];
 
 export default function HomePage() {
   return (
     <div className="space-y-10 py-8">
+      <JsonLd data={websiteJsonLd} />
+      <JsonLd data={softwareApplicationJsonLd} />
       <section className="grid gap-8 lg:grid-cols-[1.4fr_0.9fr]">
         <Card className="micro-grid overflow-hidden rounded-2xl p-8 md:p-10">
           <SectionTitle
-            kicker="Requirement Terminal"
-            title="Bloomberg みたいに、要件定義を手早く読む。"
-            body="会議メモ、背景、目的、制約を入れるだけで、FLOW / SCREENS / FUNCTIONS / NFR / RISKS / GLOSSARY に整理したプレビューを返し、そのまま Excel 要件定義に落とします。"
+            kicker="AI Document Generator"
+            title="要件定義書・設計書・テスト仕様書をAIで自動生成"
+            body="日本のシステム開発現場向けに、要件定義書、基本設計書、詳細設計書、単体テスト仕様書、結合テスト仕様書のたたき台をAIで整理します。プレビュー確認後にExcel出力でき、再生成と履歴管理にも対応します。"
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/login">
-              <Button>¥980で1本作る</Button>
+              <Button>ログインして作成する</Button>
             </Link>
             <Link href="/demo">
               <Button variant="secondary">デモで試す</Button>
+            </Link>
+            <Link href="/pricing">
+              <Button variant="ghost">料金を見る</Button>
             </Link>
           </div>
           <div className="mt-10 grid gap-3 md:grid-cols-3">
@@ -41,14 +51,14 @@ export default function HomePage() {
 
         <Card className="rounded-2xl p-6">
           <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-            Snapshot
+            Supported Documents
           </p>
           <div className="mt-6 space-y-4">
             {[
-              ["Flow", "利用者フローを段階化"],
-              ["Functions", "機能要件を行単位で整理"],
-              ["NFR", "性能・セキュリティ要件を抜き出し"],
-              ["Risks", "要確認項目と判断待ちを洗い出し"],
+              ["要件定義書", "背景、目的、スコープ、機能要件を整理"],
+              ["基本設計書", "画面、機能、フロー、非機能要件を整理"],
+              ["詳細設計書", "処理ロジック、項目、例外系を整理"],
+              ["テスト仕様書", "単体・結合テストの観点と期待結果を整理"],
             ].map(([label, desc]) => (
               <div
                 key={label}
@@ -68,16 +78,16 @@ export default function HomePage() {
       <section className="grid gap-4 md:grid-cols-3">
         {[
           {
-            title: "無料 preview",
-            body: "未購入でも毎日 1 回、要件定義の骨格を確認できます。",
+            title: "日本語の業務文書",
+            body: "日本の受託開発、社内開発、SI案件でレビューしやすい粒度を意識して文書を整理します。",
           },
           {
-            title: "Google login",
-            body: "登録障壁を下げて、初回ログインを最短化します。",
+            title: "Excel出力",
+            body: "プレビューで確認した内容をExcel形式で出力し、社内レビューや顧客確認に回しやすくします。",
           },
           {
-            title: "Stripe checkout",
-            body: "必要なときだけ 1 本購入。定期利用は月額プランへ移行できます。",
+            title: "再生成と履歴管理",
+            body: "入力内容を見直しながら再生成し、文書ごとの作成履歴を管理できます。",
           },
         ].map((item) => (
           <Card key={item.title} className="rounded-2xl p-6">

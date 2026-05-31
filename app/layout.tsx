@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
+import { homeDescription, homeTitle, siteName, siteUrl } from "@/lib/seo";
 
 const noto = Noto_Sans_JP({
   subsets: ["latin"],
@@ -12,8 +13,32 @@ const noto = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "Docs | 要件定義をすぐ形にする",
-  description: "議事録や背景情報から要件定義のプレビューと Excel を生成する Web SaaS",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: homeTitle,
+    template: `%s | ${siteName}`,
+  },
+  description: homeDescription,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: "/",
+    siteName,
+    locale: "ja_JP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: homeTitle,
+    description: homeDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
