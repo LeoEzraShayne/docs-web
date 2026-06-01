@@ -34,7 +34,7 @@ export default function PricingPage() {
     <div className="space-y-8 py-8">
       <JsonLd data={faqJsonLd(pricingFaq)} />
       <SectionTitle
-        kicker="Pricing"
+        kicker="料金"
         title="AIドキュメント生成に必要な文書枠だけ購入"
         body="要件定義書、基本設計書、詳細設計書、単体テスト仕様書、結合テスト仕様書を必要な分だけ作成できます。無料プレビューで確認し、Excel出力が必要な文書だけ購入できます。"
       />

@@ -35,7 +35,7 @@ export default function WorkspacePage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-              Projects
+              案件
             </p>
             <h1 className="mt-2 text-3xl font-bold text-slate-50">案件一覧</h1>
           </div>
@@ -46,19 +46,19 @@ export default function WorkspacePage() {
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Total
+              合計
             </p>
             <p className="mt-2 text-2xl font-bold text-slate-100">{projects.length}</p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Ready
+              生成済み
             </p>
             <p className="mt-2 text-2xl font-bold text-amber-200">{readyCount}</p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Last Updated
+              最終更新
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-200">
               {projects[0]

@@ -10,7 +10,7 @@ export default function ContactPage() {
     <div className="space-y-6 py-8">
       <Card className="rounded-2xl p-8">
         <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-          Contact
+          お問い合わせ
         </p>
         <h1 className="mt-3 text-3xl font-bold text-slate-50">お問い合わせ</h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
@@ -18,11 +18,11 @@ export default function ContactPage() {
         </p>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-5">
-            <p className="text-sm font-semibold text-slate-100">Support</p>
+            <p className="text-sm font-semibold text-slate-100">サポート</p>
             <p className="mt-2 text-sm text-slate-400">{supportEmail}</p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-5">
-            <p className="text-sm font-semibold text-slate-100">General Contact</p>
+            <p className="text-sm font-semibold text-slate-100">総合窓口</p>
             <p className="mt-2 text-sm text-slate-400">{contactEmail}</p>
           </div>
         </div>

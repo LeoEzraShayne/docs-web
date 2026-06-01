@@ -19,6 +19,7 @@ function LoginPageContent() {
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailNotice, setEmailNotice] = useState<string | null>(null);
   const codeInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -66,16 +67,18 @@ function LoginPageContent() {
     try {
       setLoading(true);
       setEmailError(null);
-      await api.startEmailLogin(email);
+      setEmailNotice(null);
+      const result = await api.startEmailLogin(email);
+      if (result.emailSent === false && result.devCode) {
+        setCode(result.devCode);
+        setEmailNotice(`ローカル開発用コード: ${result.devCode}`);
+      } else if (result.emailSent === false) {
+        setEmailNotice("メール送信はスキップされました。");
+      }
       setCooldown(60);
       window.setTimeout(() => codeInputRef.current?.focus(), 50);
     } catch (err) {
-      const formatted = formatApiError(err);
-      setEmailError(
-        formatted.requestId
-          ? `${formatted.message} | Request ID: ${formatted.requestId}`
-          : formatted.message,
-      );
+      setEmailError(formatLoginError(err));
     } finally {
       setLoading(false);
     }
@@ -85,16 +88,12 @@ function LoginPageContent() {
     try {
       setLoading(true);
       setEmailError(null);
+      setEmailNotice(null);
       await api.verifyEmailLogin(email, code);
       await refresh();
       router.replace(next);
     } catch (err) {
-      const formatted = formatApiError(err);
-      setEmailError(
-        formatted.requestId
-          ? `${formatted.message} | Request ID: ${formatted.requestId}`
-          : formatted.message,
-      );
+      setEmailError(formatLoginError(err));
     } finally {
       setLoading(false);
     }
@@ -170,12 +169,39 @@ function LoginPageContent() {
               {emailError ? (
                 <p className="text-sm text-orange-300">{emailError}</p>
               ) : null}
+              {emailNotice ? (
+                <p className="text-sm text-amber-200">{emailNotice}</p>
+              ) : null}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function formatLoginError(error: unknown) {
+  const { message } = formatApiError(error);
+  if (
+    message === "Please wait 60 seconds before retrying" ||
+    message === "60秒後にもう一度お試しください。"
+  ) {
+    return "60秒後にもう一度お試しください。";
+  }
+  if (
+    message === "Too many requests from this IP" ||
+    message ===
+      "アクセスが集中しています。しばらくしてからもう一度お試しください。"
+  ) {
+    return "アクセスが集中しています。しばらくしてからもう一度お試しください。";
+  }
+  if (
+    message === "Invalid code" ||
+    message === "認証コードが正しくありません。"
+  ) {
+    return "認証コードが正しくありません。";
+  }
+  return message;
 }
 
 export default function LoginPage() {

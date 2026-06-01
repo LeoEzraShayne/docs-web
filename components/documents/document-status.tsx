@@ -1,5 +1,6 @@
 import { Button } from "@/components/button";
 import { api } from "@/lib/api";
+import { documentCommonCopy } from "@/lib/copy/document-page-copy";
 import type { DocumentSummary, DocumentType } from "@/lib/types";
 
 export function SheetSelector({
@@ -76,13 +77,13 @@ export function ResultPanel({
   return (
     <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-950/30 p-4">
       <p className="text-sm font-medium text-emerald-100">
-        生成が完了しました。v{versionNo} を保存しました。
+        {documentCommonCopy.generationComplete(versionNo)}
       </p>
       <p className="mt-1 text-xs text-emerald-200/80">
-        ダウンロードを開始しました。必要な場合は再ダウンロードできます。
+        {documentCommonCopy.downloadStarted}
       </p>
       <a className="mt-3 inline-flex" href={downloadUrl}>
-        <Button variant="secondary">再ダウンロード</Button>
+        <Button variant="secondary">{documentCommonCopy.redownload}</Button>
       </a>
     </div>
   );
@@ -113,12 +114,14 @@ export function VersionsPanel({
                 version.versionNo,
               )}
             >
-              <Button variant="ghost">再ダウンロード</Button>
+              <Button variant="ghost">{documentCommonCopy.redownload}</Button>
             </a>
           </div>
         ))
       ) : (
-        <p className="text-sm text-slate-500">まだバージョンはありません。</p>
+        <p className="text-sm text-slate-500">
+          {documentCommonCopy.noVersions}
+        </p>
       )}
     </div>
   );

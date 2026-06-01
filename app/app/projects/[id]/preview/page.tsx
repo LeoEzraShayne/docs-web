@@ -28,7 +28,6 @@ function ProjectPreviewPageContent() {
   const [activeTab, setActiveTab] = useState("flow");
   const [data, setData] = useState<GenerateResponse | ProjectVersionResponse | null>(null);
   const [message, setMessage] = useState("読み込み中...");
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -73,13 +72,13 @@ function ProjectPreviewPageContent() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-              Preview
+              プレビュー
             </p>
             <h1 className="mt-2 text-3xl font-bold text-slate-50">
               {data.project.docTitle}
             </h1>
             <p className="mt-2 text-sm text-slate-500">
-              Version {data.versionNo}
+              バージョン {data.versionNo}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -91,48 +90,35 @@ function ProjectPreviewPageContent() {
                 <Button>Excel ダウンロード</Button>
               </a>
             ) : (
-              <Button
-                variant="secondary"
-                disabled={checkoutLoading}
-                onClick={async () => {
-                  try {
-                    setCheckoutLoading(true);
-                    sessionStorage.setItem("pendingProjectId", params.id);
-                    const checkout = await api.checkoutOneshot();
-                    window.location.href = checkout.url;
-                  } catch (err) {
-                    setMessage(formatApiError(err).message);
-                  } finally {
-                    setCheckoutLoading(false);
-                  }
-                }}
-              >
-                購入してダウンロード
-              </Button>
+              <Link href={`/app/projects/${params.id}#document-tree`}>
+                <Button variant="secondary">
+                  文書を選択してExcel生成
+                </Button>
+              </Link>
             )}
           </div>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Export
+              Excel出力
             </p>
             <p className="mt-2 text-lg font-semibold text-slate-100">
-              {paywall.canExport ? "Available" : "Locked"}
+              {paywall.canExport ? "利用可能" : "未購入"}
             </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Remaining
+              残り生成枠
             </p>
             <p className="mt-2 text-2xl font-bold text-amber-200">{paywall.remaining}</p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Rows Visible
+              表示行数
             </p>
             <p className="mt-2 text-lg font-semibold text-slate-100">
-              Preview capped
+              プレビュー制限中
             </p>
           </div>
         </div>
@@ -140,7 +126,7 @@ function ProjectPreviewPageContent() {
 
       <Card className="rounded-2xl p-6">
         <div className="mb-4 rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          Preview は制限表示です。FUNCTIONS / NFR / RISKS では高価値カラムを隠し、最大 5 行まで表示します。
+          プレビューは制限表示です。FUNCTIONS / NFR / RISKS では高価値カラムを隠し、最大 5 行まで表示します。
         </div>
         <Tabs tabs={previewTabs} active={activeTab} onChange={setActiveTab} />
         <div className="mt-6">

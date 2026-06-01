@@ -18,6 +18,10 @@ import {
   type GenerationMode,
 } from "@/lib/document-configs";
 import { api, formatApiError } from "@/lib/api";
+import {
+  defaultTestViewpoints,
+  documentCommonCopy,
+} from "@/lib/copy/document-page-copy";
 import { notifyWorkspaceTreeRefresh } from "@/lib/workspace-events";
 import type {
   DocumentSourceType,
@@ -44,7 +48,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   const [mode, setMode] = useState<GenerationMode>("standard");
   const [values, setValues] = useState<Record<string, string>>({});
   const [checks, setChecks] = useState<Record<string, string[]>>({
-    testViewpoints: ["正常系", "異常系", "入力チェック", "API連携", "DB更新"],
+    testViewpoints: defaultTestViewpoints,
   });
   const [selectedSheets, setSelectedSheets] = useState(config.sheets);
   const [status, setStatus] = useState<string | null>(null);
@@ -91,19 +95,19 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   function validate() {
     const fields = visibleFields(config.fields, sourceType);
     if (sourceType.endsWith("_VERSION") && !sourceVersionId)
-      return "上流文書バージョンを選択してください。";
+      return documentCommonCopy.versionRequired;
     const missing = fields.find(
       (field) => field.required && !values[field.key]?.trim(),
     );
-    if (missing) return `${missing.label} は必須です。`;
-    const tooLong = fields.find(
-      (field) =>
-        field.maxLength && (values[field.key]?.length ?? 0) > field.maxLength,
-    );
-    if (tooLong)
-      return `${tooLong.label} は ${tooLong.maxLength} 文字以内です。`;
+    if (missing) return documentCommonCopy.fieldRequired(missing.label);
+    const tooLong = fields.find((field) => {
+      if (typeof field.maxLength !== "number") return false;
+      return (values[field.key]?.length ?? 0) > field.maxLength;
+    });
+    if (tooLong && typeof tooLong.maxLength === "number")
+      return documentCommonCopy.maxLength(tooLong.label, tooLong.maxLength);
     if (mode === "custom" && selectedSheets.length < 1)
-      return "少なくとも1つのシートを選択してください。";
+      return documentCommonCopy.sheetRequired;
     return null;
   }
 
@@ -129,7 +133,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         },
         crypto.randomUUID(),
       );
-      setStatus(config.progress.at(-1) ?? "完了しました");
+      setStatus(config.progress.at(-1) ?? documentCommonCopy.done);
       setPercent(100);
       await load();
       notifyWorkspaceTreeRefresh({ projectId: params.id });
@@ -175,7 +179,11 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   }
 
   async function purchase() {
-    const checkout = await api.checkoutSingleDocument();
+    sessionStorage.setItem("pendingProjectId", params.id);
+    const checkout = await api.checkoutSingleDocument(type, {
+      projectId: params.id,
+      documentId: currentDocument?.id,
+    });
     window.location.href = checkout.url;
   }
 
@@ -183,17 +191,19 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
     <div className="space-y-6">
       <Card className="rounded-2xl p-6">
         <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-          Document Generator
+          {documentCommonCopy.eyebrow}
         </p>
         <h1 className="mt-2 text-3xl font-bold text-slate-50">
           {config.title}
         </h1>
         <p className="mt-4 text-sm text-slate-300">
-          案件: {project?.docTitle ?? "読み込み中..."}
+          {documentCommonCopy.projectPrefix}:{" "}
+          {project?.docTitle ?? documentCommonCopy.loading}
         </p>
         {currentDocument?.grant ? (
           <p className="mt-2 text-xs text-slate-500">
-            残り生成回数: {currentDocument.grant.remainingGenerations}
+            {documentCommonCopy.remainingGenerations}:{" "}
+            {currentDocument.grant.remainingGenerations}
           </p>
         ) : null}
       </Card>
@@ -233,10 +243,10 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         ) : null}
         <div className="flex flex-wrap gap-3">
           <Button disabled={submitting} onClick={() => void generate()}>
-            {submitting ? "生成中..." : config.submitLabel}
+            {submitting ? documentCommonCopy.generating : config.submitLabel}
           </Button>
           <Button variant="secondary" onClick={() => void purchase()}>
-            1文書を購入
+            {documentCommonCopy.purchaseSingleDocument}
           </Button>
         </div>
         <ProgressPanel status={status} percent={percent} />
@@ -248,7 +258,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
       </Card>
       <Card className="rounded-2xl p-6">
         <p className="mb-4 text-xs uppercase tracking-[0.28em] text-slate-500">
-          Versions
+          {documentCommonCopy.versions}
         </p>
         <VersionsPanel
           projectId={params.id}

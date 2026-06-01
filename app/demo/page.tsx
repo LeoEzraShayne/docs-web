@@ -48,13 +48,13 @@ export default function DemoPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-              Demo Preview
+              デモプレビュー
             </p>
             <h1 className="mt-2 text-3xl font-bold text-slate-50">
               無料デモ
             </h1>
             <p className="mt-2 text-sm text-slate-400">
-              デモではサーバー側で redaction された preview のみ表示します。
+              デモではサーバー側で一部を伏せたプレビューのみ表示します。
             </p>
           </div>
           <Link href="/login">

@@ -16,7 +16,7 @@ export function Footer() {
         <div className="grid gap-6 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-              Documents
+              文書
             </p>
             <div className="mt-3 flex flex-wrap gap-4">
               <Link href="/requirements-definition-ai">要件定義書AI</Link>
@@ -28,7 +28,7 @@ export function Footer() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-              Resources
+              リソース
             </p>
             <div className="mt-3 flex flex-wrap gap-4">
               <Link href="/pricing">料金</Link>
@@ -40,7 +40,7 @@ export function Footer() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-              Legal
+              法務
             </p>
             <div className="mt-3 flex flex-wrap gap-4">
               <Link href="/terms">利用規約</Link>

@@ -2,66 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "./button";
+import { projectFormPageCopy } from "@/lib/copy/project-form-copy";
+import { projectFormFields } from "@/lib/project-form-config";
 import type { ProjectFormValues } from "@/lib/types";
 
-const fieldOrder: Array<{
-  key: keyof ProjectFormValues;
-  label: string;
-  multiline?: boolean;
-  required?: boolean;
-}> = [
-  { key: "docTitle", label: "案件タイトル" },
-  { key: "industry", label: "業界", required: true },
-  { key: "systemType", label: "システム種別", required: true },
-  { key: "purpose", label: "目的", required: true, multiline: true },
-  { key: "background", label: "背景", multiline: true },
-  { key: "goals", label: "ゴール", multiline: true },
-  { key: "inScope", label: "対象範囲", multiline: true },
-  { key: "outScope", label: "対象外", multiline: true },
-  { key: "assumptions", label: "前提条件", multiline: true },
-  { key: "constraints", label: "制約", multiline: true },
-  { key: "rolesText", label: "関係者", multiline: true },
-  { key: "minutesText", label: "議事録", multiline: true, required: true },
-];
-
-export function emptyProjectForm(): ProjectFormValues {
-  return {
-    docTitle: "",
-    industry: "",
-    systemType: "",
-    purpose: "",
-    background: "",
-    goals: "",
-    inScope: "",
-    outScope: "",
-    assumptions: "",
-    constraints: "",
-    rolesText: "",
-    minutesText: "",
-  };
-}
-
-export function mapProjectToForm(project: {
-  docTitle?: string;
-  minutesText?: string;
-  formFields?: Record<string, unknown>;
-}): ProjectFormValues {
-  const fields = project.formFields ?? {};
-  return {
-    docTitle: project.docTitle ?? "",
-    industry: String(fields.industry ?? ""),
-    systemType: String(fields.systemType ?? ""),
-    purpose: String(fields.purpose ?? ""),
-    background: String(fields.background ?? ""),
-    goals: String(fields.goals ?? ""),
-    inScope: String(fields.inScope ?? ""),
-    outScope: String(fields.outScope ?? ""),
-    assumptions: String(fields.assumptions ?? ""),
-    constraints: String(fields.constraints ?? ""),
-    rolesText: String(fields.rolesText ?? ""),
-    minutesText: project.minutesText ?? "",
-  };
-}
+export { emptyProjectForm, mapProjectToForm } from "@/lib/project-form-values";
 
 export function ProjectForm({
   initialValues,
@@ -69,7 +14,6 @@ export function ProjectForm({
   onPreview,
   onExport,
   onSave,
-  allowHighQuality = false,
 }: {
   initialValues: ProjectFormValues;
   submitting: boolean;
@@ -79,10 +23,8 @@ export function ProjectForm({
     quality: "standard" | "high",
   ) => Promise<void>;
   onSave?: (values: ProjectFormValues) => Promise<void>;
-  allowHighQuality?: boolean;
 }) {
   const [values, setValues] = useState<ProjectFormValues>(initialValues);
-  const [quality, setQuality] = useState<"standard" | "high">("standard");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,12 +40,15 @@ export function ProjectForm({
     event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
-    const missingRequiredField = fieldOrder.find(
+    const missingRequiredField = projectFormFields.find(
       (field) => field.required && !String(values[field.key] ?? "").trim(),
     );
 
     if (missingRequiredField) {
-      setError(`${missingRequiredField.label} は必須です。`);
+      setError(
+        missingRequiredField.validationMessage ??
+          `${missingRequiredField.label} は必須です。`,
+      );
       return;
     }
 
@@ -117,7 +62,7 @@ export function ProjectForm({
       if (action === "preview") {
         await onPreview(values);
       } else if (action === "export") {
-        await onExport(values, quality);
+        await onExport(values, "standard");
       } else if (onSave) {
         await onSave(values);
       }
@@ -129,7 +74,7 @@ export function ProjectForm({
   return (
     <form className="space-y-6" onSubmit={(event) => submit("preview", event)}>
       <div className="grid gap-4 md:grid-cols-2">
-        {fieldOrder.map((field) => {
+        {projectFormFields.map((field) => {
           const value = values[field.key];
           const isMinutes = field.key === "minutesText";
           const wide = field.multiline || isMinutes;
@@ -148,16 +93,23 @@ export function ProjectForm({
                 <textarea
                   rows={isMinutes ? 10 : 4}
                   value={value}
+                  placeholder={field.placeholder}
                   onChange={(event) => update(field.key, event.target.value)}
                   className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500"
                 />
               ) : (
                 <input
                   value={value}
+                  placeholder={field.placeholder}
                   onChange={(event) => update(field.key, event.target.value)}
                   className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500"
                 />
               )}
+              {field.helper ? (
+                <span className="block text-xs leading-relaxed text-slate-500">
+                  {field.helper}
+                </span>
+              ) : null}
             </label>
           );
         })}
@@ -167,17 +119,6 @@ export function ProjectForm({
         <Button type="submit" disabled={submitting}>
           プレビュー生成（無料）
         </Button>
-        <select
-          value={quality}
-          disabled={!allowHighQuality}
-          onChange={(event) =>
-            setQuality(event.target.value as "standard" | "high")
-          }
-          className="rounded-md border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="standard">standard</option>
-          <option value="high">high</option>
-        </select>
         <Button
           type="button"
           variant="secondary"
@@ -186,7 +127,7 @@ export function ProjectForm({
             void submit("export", event as unknown as React.FormEvent<HTMLFormElement>)
           }
         >
-          購入してExcel生成（有料）
+          文書を選択してExcel生成
         </Button>
         {onSave ? (
           <Button
@@ -203,14 +144,11 @@ export function ProjectForm({
       </div>
 
       <div className="flex items-center justify-between text-xs text-slate-500">
-        <span>未購入ユーザーはプレビュー 1 日 1 回まで</span>
+        <span>
+          {projectFormPageCopy.unpaidPreviewLimit}
+        </span>
         <span>{values.minutesText.length} / 20000</span>
       </div>
-      {!allowHighQuality ? (
-        <p className="text-xs text-slate-500">
-          high 品質 export は Pro / Business のみ利用できます。
-        </p>
-      ) : null}
 
       {error ? <p className="text-sm text-orange-300">{error}</p> : null}
     </form>

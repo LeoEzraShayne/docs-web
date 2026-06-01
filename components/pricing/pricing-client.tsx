@@ -7,6 +7,8 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { documentTypeOptions } from "@/lib/document-labels";
+import type { DocumentType } from "@/lib/types";
 
 type Plan = {
   name: string;
@@ -50,6 +52,7 @@ export function PricingClient() {
   const { status } = useAuth();
   const [loading, setLoading] = useState<Plan["action"] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [singleType, setSingleType] = useState<DocumentType>("REQUIREMENTS");
 
   async function checkout(action: Plan["action"]) {
     if (!action) return;
@@ -63,7 +66,7 @@ export function PricingClient() {
       const response =
         action === "business"
           ? await api.checkoutBusinessPack()
-          : await api.checkoutSingleDocument();
+          : await api.checkoutSingleDocument(singleType);
       window.location.assign(response.url);
     } catch (err) {
       const formatted = formatApiError(err);
@@ -82,7 +85,9 @@ export function PricingClient() {
         {plans.map((plan) => (
           <Card
             key={plan.name}
-            className={plan.highlight ? "border-amber-300/60" : ""}
+            className={`flex h-full flex-col ${
+              plan.highlight ? "border-amber-300/60" : ""
+            }`}
           >
             <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
               {plan.name}
@@ -96,15 +101,37 @@ export function PricingClient() {
                 <li key={item}>• {item}</li>
               ))}
             </ul>
-            {plan.action ? (
-              <Button
-                className="mt-6 w-full"
-                disabled={loading !== null}
-                onClick={() => void checkout(plan.action)}
-              >
-                {loading === plan.action ? "遷移中..." : "購入する"}
-              </Button>
-            ) : null}
+            <div className="mt-auto pt-6">
+              {plan.action === "single" ? (
+                <label className="block text-sm text-slate-300">
+                  <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">
+                    購入する文書
+                  </span>
+                  <select
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-amber-300"
+                    value={singleType}
+                    onChange={(event) =>
+                      setSingleType(event.target.value as DocumentType)
+                    }
+                  >
+                    {documentTypeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+              {plan.action ? (
+                <Button
+                  className="mt-6 w-full"
+                  disabled={loading !== null}
+                  onClick={() => void checkout(plan.action)}
+                >
+                  {loading === plan.action ? "遷移中..." : "購入する"}
+                </Button>
+              ) : null}
+            </div>
           </Card>
         ))}
       </div>

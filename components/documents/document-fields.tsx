@@ -1,4 +1,5 @@
 import type { DocumentFieldConfig } from "@/lib/document-configs";
+import { documentCommonCopy } from "@/lib/copy/document-page-copy";
 import type { DocumentSourceType } from "@/lib/types";
 
 export function visibleFields(fields: DocumentFieldConfig[], sourceType: DocumentSourceType) {
@@ -37,8 +38,8 @@ export function DocumentFields({
         </fieldset>
       ) : (
         <label key={field.key} className="space-y-2">
-          <span className="text-sm text-slate-300">{field.label}{field.required ? <span className="ml-2 text-xs text-amber-300">必須</span> : null}</span>
-          <textarea rows={4} value={values[field.key] ?? ""} maxLength={field.maxLength} onChange={(event) => onValue(field.key, event.target.value)} className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100" />
+          <span className="text-sm text-slate-300">{field.label}{field.required ? <span className="ml-2 text-xs text-amber-300">{documentCommonCopy.required}</span> : null}</span>
+          <textarea rows={4} value={values[field.key] ?? ""} placeholder={field.placeholder} maxLength={field.maxLength} onChange={(event) => onValue(field.key, event.target.value)} className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500" />
           {field.maxLength ? <p className="text-right text-xs text-slate-500">{values[field.key]?.length ?? 0} / {field.maxLength}</p> : null}
         </label>
       ))}

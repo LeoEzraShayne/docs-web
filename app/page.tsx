@@ -51,7 +51,7 @@ export default function HomePage() {
 
         <Card className="rounded-2xl p-6">
           <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-            Supported Documents
+            対応文書
           </p>
           <div className="mt-6 space-y-4">
             {[
@@ -68,7 +68,7 @@ export default function HomePage() {
                   <p className="text-lg font-semibold text-slate-100">{label}</p>
                   <p className="text-sm text-slate-500">{desc}</p>
                 </div>
-                <p className="text-sm text-amber-200">Ready</p>
+                <p className="text-sm text-amber-200">対応済み</p>
               </div>
             ))}
           </div>

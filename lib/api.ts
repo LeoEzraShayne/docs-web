@@ -3,6 +3,8 @@
 import type {
   AuthMeResponse,
   BillingSummary,
+  AccountUsageResponse,
+  PurchaseHistoryResponse,
   GenerateResponse,
   DocumentSummary,
   DocumentType,
@@ -36,7 +38,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const payload = await response
       .json()
       .catch(() => ({ message: response.statusText }));
-    const error = new Error(payload?.message ?? "Request failed") as ApiError;
+    const error = new Error(
+      translateApiMessage(payload?.message ?? "Request failed"),
+    ) as ApiError;
     error.status = response.status;
     error.requestId =
       response.headers.get("x-request-id") ?? payload?.requestId ?? undefined;
@@ -63,6 +67,11 @@ export const api = {
   request,
   getAuthMe: () => request<AuthMeResponse>("/auth/me"),
   getBillingSummary: () => request<BillingSummary>("/billing/me"),
+  getAccountUsage: () => request<AccountUsageResponse>("/billing/account-usage"),
+  getPurchaseHistory: (page: number, pageSize: number) =>
+    request<PurchaseHistoryResponse>(
+      `/billing/purchases?page=${page}&pageSize=${pageSize}`,
+    ),
   getProjects: () => request<ProjectSummary[]>("/projects"),
   getProject: (id: string) => request<ProjectDetail>(`/projects/${id}`),
   getProjectVersion: (id: string, versionNo: number) =>
@@ -100,7 +109,7 @@ export const api = {
   deleteProject: (id: string) =>
     request<{ ok: true }>(`/projects/${id}`, { method: "DELETE" }),
   startEmailLogin: (email: string) =>
-    request<{ ok: true }>("/auth/start", {
+    request<{ ok: true; emailSent?: boolean; devCode?: string }>("/auth/start", {
       method: "POST",
       body: JSON.stringify({ email }),
     }),
@@ -133,9 +142,22 @@ export const api = {
     }),
   checkoutOneshot: () =>
     request<{ url: string }>("/billing/checkout/oneshot", { method: "POST" }),
-  checkoutSingleDocument: () =>
+  checkoutSingleDocument: (
+    documentType?: DocumentType,
+    context?: { projectId?: string; documentId?: string | null },
+  ) =>
     request<{ url: string }>("/billing/checkout/single-document", {
       method: "POST",
+      body: JSON.stringify({
+        documentType,
+        projectId: context?.projectId,
+        documentId: context?.documentId ?? undefined,
+      }),
+    }),
+  confirmCheckout: (sessionId: string) =>
+    request<{ ok: true; skipped?: true }>("/billing/checkout/confirm", {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
     }),
   checkoutBusinessPack: () =>
     request<{ url: string }>("/billing/checkout/business-pack", {
@@ -164,8 +186,51 @@ export const api = {
 export function formatApiError(error: unknown) {
   const apiError = error as ApiError;
   return {
-    message: apiError.message || "未知错误",
+    message: translateApiMessage(apiError.message || "エラーが発生しました。"),
     requestId: apiError.requestId,
     status: apiError.status,
   };
+}
+
+function translateApiMessage(message: unknown) {
+  const raw = Array.isArray(message) ? message.join(" / ") : String(message);
+  const translations: Record<string, string> = {
+    "Request failed": "リクエストに失敗しました。",
+    "Free tier project limit reached":
+      "無料プランの案件作成上限に達しました。不要な案件を削除するか、文書枠を購入してから続行してください。",
+    "minutesText exceeds 20,000 characters":
+      "議事録は20,000文字以内にしてください。",
+    "Project not found": "案件が見つかりません。",
+    "Project does not belong to user":
+      "この案件にアクセスする権限がありません。",
+    "Version not found": "バージョンが見つかりません。",
+    "Preview limit reached for today":
+      "本日の無料プレビュー上限に達しました。",
+    "Preview unavailable beyond free limit":
+      "無料プレビューの上限を超えています。",
+    "Demo daily limit reached":
+      "本日のデモ利用上限に達しました。",
+    "No document generation entitlement":
+      "文書生成に利用できる購入枠がありません。",
+    "No document generations remaining":
+      "この文書の残り生成回数がありません。",
+    "Checkout session does not belong to user":
+      "決済情報のユーザー確認に失敗しました。",
+    "Checkout session is not paid": "決済が完了していません。",
+    "Invalid document type": "文書種別が正しくありません。",
+    "Invalid code": "認証コードが正しくありません。",
+    "Too many requests from this IP":
+      "アクセスが集中しています。しばらくしてからもう一度お試しください。",
+    "Please wait 60 seconds before retrying":
+      "60秒後にもう一度お試しください。",
+    "High quality requires Pro or Business":
+      "高品質生成は Pro / Business のみ利用できます。",
+    "No credits remaining": "利用可能な生成枠がありません。",
+    "Entitlement not found": "利用状況が見つかりません。",
+    "User not found": "ユーザーが見つかりません。",
+    "Invalid Google token": "Googleログインの認証に失敗しました。",
+    "GOOGLE_CLIENT_ID is not configured":
+      "Googleログイン設定が不足しています。",
+  };
+  return translations[raw] ?? raw;
 }

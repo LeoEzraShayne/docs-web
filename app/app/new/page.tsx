@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/card";
 import { ProjectForm, emptyProjectForm } from "@/components/project-form";
 import { api, formatApiError } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { projectFormPageCopy } from "@/lib/copy/project-form-copy";
 import type { ProjectFormValues } from "@/lib/types";
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const { billing } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
   async function createProject(values: ProjectFormValues) {
@@ -37,17 +36,11 @@ export default function NewProjectPage() {
     }
   }
 
-  async function handleExport(
-    values: ProjectFormValues,
-    quality: "standard" | "high",
-  ) {
+  async function handleExport(values: ProjectFormValues) {
     try {
       setSubmitting(true);
       const created = await createProject(values);
-      void quality;
-      const checkout = await api.checkoutOneshot();
-      sessionStorage.setItem("pendingProjectId", created.id);
-      window.location.href = checkout.url;
+      router.push(`/app/projects/${created.id}#document-tree`);
     } catch (err) {
       throw new Error(formatApiError(err).message);
     } finally {
@@ -58,11 +51,11 @@ export default function NewProjectPage() {
   return (
     <Card className="rounded-2xl p-6">
       <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-        New Project
+        新規案件
       </p>
       <h1 className="mt-2 text-3xl font-bold text-slate-50">新規案件作成</h1>
       <p className="mt-3 text-sm text-slate-400">
-        入力後、無料 preview または Stripe checkout に進めます。
+        {projectFormPageCopy.description}
       </p>
       <div className="mt-6">
         <ProjectForm
@@ -70,9 +63,6 @@ export default function NewProjectPage() {
           submitting={submitting}
           onPreview={handlePreview}
           onExport={handleExport}
-          allowHighQuality={
-            billing?.planType === "PRO" || billing?.planType === "BUSINESS"
-          }
         />
       </div>
     </Card>

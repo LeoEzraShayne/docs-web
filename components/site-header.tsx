@@ -8,10 +8,10 @@ import { Button } from "./button";
 import { BrandMark } from "./brand-mark";
 
 const links = [
-  { href: "/", label: "Overview" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/demo", label: "Demo" },
-  { href: "/contact", label: "Contact" },
+  { href: "/", label: "概要" },
+  { href: "/pricing", label: "料金" },
+  { href: "/demo", label: "デモ" },
+  { href: "/contact", label: "お問い合わせ" },
 ];
 
 export function SiteHeader() {
@@ -53,18 +53,18 @@ export function SiteHeader() {
                 {user?.email}
               </div>
               <Link href="/account">
-                <Button variant="ghost">Account</Button>
+                <Button variant="ghost">アカウント</Button>
               </Link>
               <Link href="/app">
-                <Button>Workspace</Button>
+                <Button>ワークスペース</Button>
               </Link>
               <Button variant="ghost" onClick={() => void handleLogout()}>
-                Logout
+                ログアウト
               </Button>
             </>
           ) : (
             <Link href="/login">
-              <Button>Login</Button>
+              <Button>ログイン</Button>
             </Link>
           )}
         </div>

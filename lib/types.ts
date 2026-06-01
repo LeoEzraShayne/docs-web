@@ -4,6 +4,57 @@ export type BillingSummary = {
   periodEnd: string | null;
 };
 
+export type AccountUsageResponse = {
+  summary: {
+    email: string;
+    planType: BillingSummary["planType"];
+    hasBusinessPack: boolean;
+    businessPack?: {
+      totalDocumentCredits: number;
+      unstartedDocumentCredits: number;
+      startedDocumentCount: number;
+      expiresAt: string | null;
+      status: "利用中" | "利用不可";
+    };
+    nearestExpiresAt: string | null;
+    nextExpiringDocument: {
+      documentTitle: string;
+      expiresAt: string;
+    } | null;
+    needsPurchase: boolean;
+  };
+  documents: Array<{
+    projectId: string;
+    projectTitle: string | null;
+    documentId: string;
+    documentType: DocumentType;
+    documentTitle: string;
+    generationCount: number;
+    remainingGenerations?: number;
+    expiresAt: string | null;
+    status: "利用中" | "利用不可";
+  }>;
+};
+
+export type PurchaseHistoryResponse = {
+  items: Array<{
+    id: string;
+    purchasedAt: string;
+    productName: string;
+    documentType: DocumentType | null;
+    documentTitle: string | null;
+    amountJpy: number;
+    status: string;
+    grantedContent: string;
+    stripeSessionId: string | null;
+    stripeInvoiceId: string | null;
+  }>;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
+
 export type AuthMeResponse = {
   user: {
     id: string;

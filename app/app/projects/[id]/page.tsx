@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/button";
@@ -10,7 +10,6 @@ import { Card } from "@/components/card";
 import { DocumentTreePanel } from "@/components/documents/document-tree-panel";
 import { ProjectForm, mapProjectToForm } from "@/components/project-form";
 import { api, formatApiError } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
 import type {
   DocumentSummary,
   ProjectDetail,
@@ -20,13 +19,13 @@ import type {
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { billing } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number>(0);
   const [deleting, setDeleting] = useState(false);
+  const documentTreeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -43,6 +42,12 @@ export default function ProjectDetailPage() {
     }
     void load();
   }, [params.id]);
+
+  useEffect(() => {
+    if (project && window.location.hash === "#document-tree") {
+      window.setTimeout(() => scrollToDocumentTree(), 0);
+    }
+  }, [project]);
 
   async function persist(values: ProjectFormValues) {
     const updated = await api.updateProject(params.id, values);
@@ -65,7 +70,7 @@ export default function ProjectDetailPage() {
 
     try {
       setSubmitting(true);
-      const updated = await persist(values);
+      await persist(values);
       setCooldownUntil(Date.now() + 30_000);
 
       const response = await api.generateProject(
@@ -85,20 +90,31 @@ export default function ProjectDetailPage() {
         return;
       }
 
-      if (!response.paywall.canExport) {
-        sessionStorage.setItem("pendingProjectId", params.id);
-        const checkout = await api.checkoutOneshot();
-        window.location.href = checkout.url;
-        return;
-      }
-
-      window.location.href = api.getDownloadUrl(params.id, response.versionNo);
-      setProject(updated);
+      scrollToDocumentTree();
     } catch (err) {
       throw new Error(formatApiError(err).message);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function selectDocumentForExport(values: ProjectFormValues) {
+    try {
+      setSubmitting(true);
+      await persist(values);
+      scrollToDocumentTree();
+    } catch (err) {
+      throw new Error(formatApiError(err).message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function scrollToDocumentTree() {
+    documentTreeRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }
 
   async function handleDelete() {
@@ -131,7 +147,7 @@ export default function ProjectDetailPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-              Project Detail
+              案件詳細
             </p>
             <h1 className="mt-2 text-3xl font-bold text-slate-50">
               {project.docTitle}
@@ -155,27 +171,26 @@ export default function ProjectDetailPage() {
             initialValues={mapProjectToForm(project)}
             submitting={submitting}
             onPreview={(values) => generate(values, "preview", "standard")}
-            onExport={(values, quality) => generate(values, "export", quality)}
+            onExport={(values) => selectDocumentForExport(values)}
             onSave={persistForForm}
-            allowHighQuality={
-              billing?.planType === "PRO" || billing?.planType === "BUSINESS"
-            }
           />
         </div>
       </Card>
 
-      <Card className="rounded-2xl p-6">
-        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
-          Document Tree
-        </p>
-        <div className="mt-4">
-          <DocumentTreePanel projectId={params.id} documents={documents} />
-        </div>
-      </Card>
+      <div ref={documentTreeRef} id="document-tree" className="scroll-mt-24">
+        <Card className="rounded-2xl p-6">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
+            文書ツリー
+          </p>
+          <div className="mt-4">
+            <DocumentTreePanel projectId={params.id} documents={documents} />
+          </div>
+        </Card>
+      </div>
 
       <Card className="rounded-2xl p-6">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
-          Versions
+          バージョン
         </p>
         <div className="mt-4 grid gap-3">
           {project.versions.map((version) => (
@@ -185,7 +200,7 @@ export default function ProjectDetailPage() {
             >
               <div>
                 <p className="font-medium text-slate-100">
-                  Version {version.versionNo}
+                  バージョン {version.versionNo}
                 </p>
                 <p className="text-sm text-slate-500">
                   {new Date(version.createdAt).toLocaleString("ja-JP")}
@@ -195,10 +210,10 @@ export default function ProjectDetailPage() {
                 <Link
                   href={`/app/projects/${params.id}/preview?ver=${version.versionNo}`}
                 >
-                  <Button variant="secondary">Preview</Button>
+                  <Button variant="secondary">プレビュー</Button>
                 </Link>
                 <a href={api.getDownloadUrl(params.id, version.versionNo)}>
-                  <Button>Download</Button>
+                  <Button>ダウンロード</Button>
                 </a>
               </div>
             </div>

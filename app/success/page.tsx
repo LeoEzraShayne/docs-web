@@ -8,10 +8,28 @@ import { api } from "@/lib/api";
 
 export default function SuccessPage() {
   const [pendingProjectId, setPendingProjectId] = useState<string | null>(null);
+  const [message, setMessage] = useState(
+    "決済内容を確認しています。反映まで少しお待ちください。",
+  );
 
   useEffect(() => {
     queueMicrotask(() => {
+      const sessionId = new URLSearchParams(window.location.search).get(
+        "session_id",
+      );
       const stored = sessionStorage.getItem("pendingProjectId");
+      if (sessionId) {
+        void api
+          .confirmCheckout(sessionId)
+          .then(() => setMessage("購入内容を反映しました。"))
+          .catch(() =>
+            setMessage(
+              "購入確認を完了できませんでした。少し待ってから再読み込みしてください。",
+            ),
+          );
+      } else {
+        setMessage("購入内容を反映しました。");
+      }
       if (!stored) {
         return;
       }
@@ -27,13 +45,13 @@ export default function SuccessPage() {
     <div className="py-8">
       <Card className="rounded-2xl p-8">
         <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
-          Payment Success
+          決済完了
         </p>
         <h1 className="mt-3 text-3xl font-bold text-slate-50">
           決済処理を受け付けました
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
-          Webhook 反映後、案件ページからダウンロードまたは追加生成ができます。すぐ反映しない場合はアカウント画面または案件画面を再読み込みしてください。
+          {message}
         </p>
         <div className="mt-6 flex gap-3">
           {pendingProjectId ? (
@@ -42,11 +60,11 @@ export default function SuccessPage() {
             </Link>
           ) : (
             <Link href="/app">
-              <Button>Workspace へ戻る</Button>
+              <Button>ワークスペースへ戻る</Button>
             </Link>
           )}
           <Link href="/account">
-            <Button variant="secondary">Account</Button>
+            <Button variant="secondary">アカウント</Button>
           </Link>
         </div>
       </Card>
