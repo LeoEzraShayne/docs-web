@@ -70,11 +70,7 @@ export function PricingClient() {
       window.location.assign(response.url);
     } catch (err) {
       const formatted = formatApiError(err);
-      setError(
-        formatted.requestId
-          ? `${formatted.message} | Request ID: ${formatted.requestId}`
-          : formatted.message,
-      );
+      setError(formatted.message);
       setLoading(null);
     }
   }

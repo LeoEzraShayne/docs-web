@@ -68,7 +68,8 @@ export const api = {
   request,
   getAuthMe: () => request<AuthMeResponse>("/auth/me"),
   getBillingSummary: () => request<BillingSummary>("/billing/me"),
-  getAccountUsage: () => request<AccountUsageResponse>("/billing/account-usage"),
+  getAccountUsage: () =>
+    request<AccountUsageResponse>("/billing/account-usage"),
   getPurchaseHistory: (page: number, pageSize: number) =>
     request<PurchaseHistoryResponse>(
       `/billing/purchases?page=${page}&pageSize=${pageSize}`,
@@ -112,10 +113,13 @@ export const api = {
   deleteProject: (id: string) =>
     request<{ ok: true }>(`/projects/${id}`, { method: "DELETE" }),
   startEmailLogin: (email: string) =>
-    request<{ ok: true; emailSent?: boolean; devCode?: string }>("/auth/start", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    }),
+    request<{ ok: true; emailSent?: boolean; devCode?: string }>(
+      "/auth/start",
+      {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      },
+    ),
   verifyEmailLogin: (email: string, code: string) =>
     request<{ token: string; user: { id: string; email: string } }>(
       "/auth/verify",
@@ -199,6 +203,10 @@ function translateApiMessage(message: unknown) {
   const raw = Array.isArray(message) ? message.join(" / ") : String(message);
   const translations: Record<string, string> = {
     "Request failed": "リクエストに失敗しました。",
+    "Failed to fetch":
+      "サーバーに接続できません。時間をおいて再度お試しください。",
+    "NetworkError when attempting to fetch resource.":
+      "サーバーに接続できません。時間をおいて再度お試しください。",
     "Free tier project limit reached":
       "無料プランの案件作成上限に達しました。不要な案件を削除するか、文書枠を購入してから続行してください。",
     "minutesText exceeds 20,000 characters":
@@ -207,16 +215,13 @@ function translateApiMessage(message: unknown) {
     "Project does not belong to user":
       "この案件にアクセスする権限がありません。",
     "Version not found": "バージョンが見つかりません。",
-    "Preview limit reached for today":
-      "本日の無料プレビュー上限に達しました。",
+    "Preview limit reached for today": "本日の無料プレビュー上限に達しました。",
     "Preview unavailable beyond free limit":
       "無料プレビューの上限を超えています。",
-    "Demo daily limit reached":
-      "本日のデモ利用上限に達しました。",
+    "Demo daily limit reached": "本日のデモ利用上限に達しました。",
     "No document generation entitlement":
       "文書生成に利用できる購入枠がありません。",
-    "No document generations remaining":
-      "この文書の残り生成回数がありません。",
+    "No document generations remaining": "この文書の残り生成回数がありません。",
     "Checkout session does not belong to user":
       "決済情報のユーザー確認に失敗しました。",
     "Checkout session is not paid": "決済が完了していません。",

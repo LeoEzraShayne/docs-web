@@ -226,7 +226,7 @@ test("validates custom sheet selection before generation", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("shows API errors with request id", async ({ page }) => {
+test("shows API errors without request id", async ({ page }) => {
   await page.unroute(`${API}/projects/project-1/documents/**/generate`);
   await mockApi(page, { failGenerate: true });
 
@@ -236,7 +236,5 @@ test("shows API errors with request id", async ({ page }) => {
   await page.getByLabel("主な機能").fill("機能");
   await page.getByRole("button", { name: "要件定義書を生成する" }).click();
 
-  await expect(
-    page.getByText("LLM unavailable | Request ID: req-failed"),
-  ).toBeVisible();
+  await expect(page.getByText("LLM unavailable")).toBeVisible();
 });

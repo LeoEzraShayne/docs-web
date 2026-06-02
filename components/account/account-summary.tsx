@@ -1,4 +1,6 @@
 import type { AccountUsageResponse } from "@/lib/types";
+import { formatCount } from "@/lib/format-number";
+import type { ReactNode } from "react";
 
 export function AccountSummary({
   usage,
@@ -9,24 +11,27 @@ export function AccountSummary({
   const business = summary?.businessPack;
   const nextExpiringDocument = summary?.nextExpiringDocument;
   const single = summary?.singleDocumentPack;
-  const businessCards = summary?.hasBusinessPack
+  const businessCards: [string, ReactNode][] = summary?.hasBusinessPack
     ? [
         ["利用形態", "Business Pack"],
         [
-          "未開始文書枠",
-          business
-            ? `${business.unstartedDocumentCredits} / ${business.totalDocumentCredits}`
-            : "-",
+          "利用状況",
+          <span key="business-usage" className="flex items-baseline gap-3">
+            <span>
+              {business ? formatCount(business.unstartedDocumentCredits) : "-"}
+            </span>
+            <span className="text-sm font-semibold text-slate-500">
+              残り / 生成済み {formatCount(business?.startedDocumentCount)}
+            </span>
+          </span>,
         ],
-        ["生成済み文書数", String(business?.startedDocumentCount ?? 0)],
         ["有効期限", formatDate(business?.expiresAt)],
       ]
     : [];
-  const singleCards = single
+  const singleCards: [string, ReactNode][] = single
     ? [
         ["利用形態", "Docs Single"],
-        ["購入済み文書数", String(single.purchasedDocumentCount)],
-        ["未使用文書枠", String(single.unstartedDocumentCredits)],
+        ["購入済み文書数", formatCount(single.purchasedDocumentCount)],
         [
           "次に失効する文書",
           single.nextExpiringDocument
@@ -45,7 +50,7 @@ export function AccountSummary({
               ? "Docs Single"
               : (summary?.planType ?? "-"),
           ],
-          ["利用中の文書数", String(usage?.documents.length ?? 0)],
+          ["利用中の文書数", formatCount(usage?.documents.length)],
           [
             "次に失効する文書",
             nextExpiringDocument
@@ -59,20 +64,10 @@ export function AccountSummary({
   return (
     <div className="mt-6 space-y-4">
       {businessCards.length ? (
-        <SummarySection
-          cards={businessCards}
-          columns="md:grid-cols-2 xl:grid-cols-4"
-        />
+        <SummarySection cards={businessCards} columns="md:grid-cols-3" />
       ) : null}
       {singleCards.length ? (
-        <SummarySection
-          cards={singleCards}
-          columns={
-            summary?.hasBusinessPack
-              ? "md:grid-cols-2 xl:grid-cols-4"
-              : "md:grid-cols-3"
-          }
-        />
+        <SummarySection cards={singleCards} columns="md:grid-cols-3" />
       ) : null}
     </div>
   );
@@ -82,7 +77,7 @@ function SummarySection({
   cards,
   columns,
 }: {
-  cards: string[][];
+  cards: [string, ReactNode][];
   columns: string;
 }) {
   return (

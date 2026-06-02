@@ -7,6 +7,7 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Pagination } from "@/components/pagination";
 import { api, formatApiError } from "@/lib/api";
+import { formatCount } from "@/lib/format-number";
 import type { ProjectPageResponse } from "@/lib/types";
 
 const projectPageSizes = [12, 24, 48];
@@ -75,7 +76,7 @@ export default function WorkspacePage() {
               合計
             </p>
             <p className="mt-2 text-2xl font-bold text-slate-100">
-              {summary?.total ?? 0}
+              {formatCount(summary?.total)}
             </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
@@ -83,7 +84,7 @@ export default function WorkspacePage() {
               生成済み
             </p>
             <p className="mt-2 text-2xl font-bold text-amber-200">
-              {summary?.readyCount ?? 0}
+              {formatCount(summary?.readyCount)}
             </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
@@ -100,13 +101,15 @@ export default function WorkspacePage() {
       </Card>
 
       {loading ? (
-        <Card className="rounded-2xl p-6 text-sm text-slate-400">読み込み中...</Card>
+        <Card className="rounded-2xl p-6 text-sm text-slate-400">
+          読み込み中...
+        </Card>
       ) : error ? (
         <Card className="rounded-2xl p-6 text-sm text-orange-300">{error}</Card>
       ) : (
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
-            <span>{projectPage?.total ?? 0}件の案件</span>
+            <span>{formatCount(projectPage?.total)}件の案件</span>
             <select
               value={pageSize}
               onChange={(event) => updatePageSize(Number(event.target.value))}

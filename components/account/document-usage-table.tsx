@@ -1,5 +1,6 @@
 import { formatDate, StatusBadge } from "./account-summary";
 import type { AccountUsageResponse } from "@/lib/types";
+import { formatCount } from "@/lib/format-number";
 
 export function DocumentUsageTable({
   usage,
@@ -10,7 +11,6 @@ export function DocumentUsageTable({
   page?: number;
   pageSize?: number;
 }) {
-  const showRemaining = !usage?.summary.hasBusinessPack;
   const allDocs = usage?.documents ?? [];
   const docs = pageSize
     ? allDocs.slice((page - 1) * pageSize, page * pageSize)
@@ -23,7 +23,7 @@ export function DocumentUsageTable({
             <th className="py-3 pr-4">案件</th>
             <th className="py-3 pr-4">文書</th>
             <th className="py-3 pr-4">生成回数</th>
-            {showRemaining ? <th className="py-3 pr-4">残り生成回数</th> : null}
+            <th className="py-3 pr-4">残り生成回数</th>
             <th className="py-3 pr-4">有効期限</th>
             <th className="py-3 pr-4">状態</th>
           </tr>
@@ -35,12 +35,12 @@ export function DocumentUsageTable({
                 {doc.projectTitle ?? "-"}
               </td>
               <td className="py-4 pr-4 text-slate-200">{doc.documentTitle}</td>
-              <td className="py-4 pr-4 text-amber-200">{doc.generationCount}</td>
-              {showRemaining ? (
-                <td className="py-4 pr-4 text-slate-200">
-                  {doc.remainingGenerations ?? 0}
-                </td>
-              ) : null}
+              <td className="py-4 pr-4 text-amber-200">
+                {formatCount(doc.generationCount)}
+              </td>
+              <td className="py-4 pr-4 text-slate-200">
+                {formatCount(doc.remainingGenerations)}
+              </td>
               <td className="py-4 pr-4 text-slate-300">
                 {formatDate(doc.expiresAt)}
               </td>
@@ -51,7 +51,7 @@ export function DocumentUsageTable({
           ))}
           {docs.length === 0 ? (
             <tr>
-              <td className="py-6 text-slate-500" colSpan={showRemaining ? 6 : 5}>
+              <td className="py-6 text-slate-500" colSpan={6}>
                 まだ文書生成の利用状況はありません。
               </td>
             </tr>

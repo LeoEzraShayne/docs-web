@@ -6,6 +6,7 @@ import { Card } from "@/components/card";
 import { ProjectForm, emptyProjectForm } from "@/components/project-form";
 import { api, formatApiError } from "@/lib/api";
 import { projectFormPageCopy } from "@/lib/copy/project-form-copy";
+import { notifyWorkspaceTreeRefresh } from "@/lib/workspace-events";
 import type { ProjectFormValues } from "@/lib/types";
 
 export default function NewProjectPage() {
@@ -24,11 +25,14 @@ export default function NewProjectPage() {
         mode: "preview",
         quality: "standard",
       });
+      notifyWorkspaceTreeRefresh({ projectId: created.id });
       sessionStorage.setItem(
         `preview:${created.id}:${response.versionNo}`,
         JSON.stringify(response),
       );
-      router.push(`/app/projects/${created.id}/preview?ver=${response.versionNo}`);
+      router.push(
+        `/app/projects/${created.id}/preview?ver=${response.versionNo}`,
+      );
     } catch (err) {
       throw new Error(formatApiError(err).message);
     } finally {
@@ -40,6 +44,7 @@ export default function NewProjectPage() {
     try {
       setSubmitting(true);
       const created = await createProject(values);
+      notifyWorkspaceTreeRefresh({ projectId: created.id });
       router.push(`/app/projects/${created.id}#document-tree`);
     } catch (err) {
       throw new Error(formatApiError(err).message);

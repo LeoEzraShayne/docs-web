@@ -1,4 +1,5 @@
 import type { PurchaseHistoryResponse } from "@/lib/types";
+import { formatNumber } from "@/lib/format-number";
 
 export const purchasePageSizes = [10, 30, 50];
 
@@ -34,7 +35,7 @@ export function PurchaseHistoryTable({
               <td className="py-4 pr-4 text-slate-200">
                 {item.status === "applied"
                   ? "購入済み枠"
-                  : `¥${item.amountJpy.toLocaleString("ja-JP")}`}
+                  : `¥${formatNumber(item.amountJpy)}`}
               </td>
               <td className="py-4 pr-4 text-slate-300">
                 {purchaseStatusLabel(item.status)}

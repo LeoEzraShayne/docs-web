@@ -1,4 +1,5 @@
 import { Button } from "@/components/button";
+import { formatCount } from "@/lib/format-number";
 
 export function Pagination({
   page,
@@ -18,7 +19,8 @@ export function Pagination({
       className={`mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400 ${className}`}
     >
       <span>
-        {total}件中 {page} / {totalPages} ページ
+        {formatCount(total)}件中 {formatCount(page)} / {formatCount(totalPages)}{" "}
+        ページ
       </span>
       <div className="flex gap-2">
         <Button

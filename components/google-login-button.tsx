@@ -50,7 +50,7 @@ export function GoogleLoginButton({
 
   useEffect(() => {
     if (!CLIENT_ID) {
-      setError("Google Client ID 未设置");
+      setError("Googleログイン設定が不足しています。");
       return;
     }
 
@@ -77,7 +77,7 @@ export function GoogleLoginButton({
     const markError = () => {
       if (!cancelled) {
         const message =
-          "Google 登录按钮加载失败，请刷新页面或使用邮箱验证码登录。";
+          "Googleログインボタンの読み込みに失敗しました。ページを再読み込みするか、メール認証コードでログインしてください。";
         setError(message);
         onError?.(message);
       }
@@ -145,9 +145,7 @@ export function GoogleLoginButton({
           router.replace(redirectTo);
         } catch (err) {
           const formatted = formatApiError(err);
-          const message = formatted.requestId
-            ? `${formatted.message} | Request ID: ${formatted.requestId}`
-            : formatted.message;
+          const message = formatted.message;
           setError(message);
           onError?.(message);
         } finally {

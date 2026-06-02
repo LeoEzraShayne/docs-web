@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/button";
 import { api } from "@/lib/api";
+import { formatCount } from "@/lib/format-number";
 import type { DocumentSummary, ProjectSummary } from "@/lib/types";
 import {
   WORKSPACE_TREE_REFRESH_EVENT,
@@ -121,7 +122,9 @@ export function WorkspaceSidebar() {
           <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
             Projects
           </p>
-          <span className="text-xs text-slate-500">{totalProjects}件</span>
+          <span className="text-xs text-slate-500">
+            {formatCount(totalProjects)}件
+          </span>
         </div>
       </div>
       <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -157,7 +160,7 @@ export function WorkspaceSidebar() {
             前へ
           </Button>
           <span className="text-xs text-slate-500">
-            {page} / {totalPages}
+            {formatCount(page)} / {formatCount(totalPages)}
           </span>
           <Button
             variant="secondary"

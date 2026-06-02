@@ -10,6 +10,7 @@ import { Card } from "@/components/card";
 import { DataTable } from "@/components/data-table";
 import { Tabs } from "@/components/tabs";
 import { api, formatApiError } from "@/lib/api";
+import { formatCount } from "@/lib/format-number";
 import type { GenerateResponse, ProjectVersionResponse } from "@/lib/types";
 
 const previewTabs = [
@@ -26,7 +27,9 @@ function ProjectPreviewPageContent() {
   const searchParams = useSearchParams();
   const versionNo = Number(searchParams.get("ver") ?? "0");
   const [activeTab, setActiveTab] = useState("flow");
-  const [data, setData] = useState<GenerateResponse | ProjectVersionResponse | null>(null);
+  const [data, setData] = useState<
+    GenerateResponse | ProjectVersionResponse | null
+  >(null);
   const [message, setMessage] = useState("読み込み中...");
 
   useEffect(() => {
@@ -91,9 +94,7 @@ function ProjectPreviewPageContent() {
               </a>
             ) : (
               <Link href={`/app/projects/${params.id}#document-tree`}>
-                <Button variant="secondary">
-                  文書を選択してExcel生成
-                </Button>
+                <Button variant="secondary">文書を選択してExcel生成</Button>
               </Link>
             )}
           </div>
@@ -111,7 +112,9 @@ function ProjectPreviewPageContent() {
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
               残り生成枠
             </p>
-            <p className="mt-2 text-2xl font-bold text-amber-200">{paywall.remaining}</p>
+            <p className="mt-2 text-2xl font-bold text-amber-200">
+              {formatCount(paywall.remaining)}
+            </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
@@ -126,13 +129,16 @@ function ProjectPreviewPageContent() {
 
       <Card className="rounded-2xl p-6">
         <div className="mb-4 rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          プレビューは制限表示です。FUNCTIONS / NFR / RISKS では高価値カラムを隠し、最大 5 行まで表示します。
+          プレビューは制限表示です。FUNCTIONS / NFR / RISKS
+          では高価値カラムを隠し、最大 5 行まで表示します。
         </div>
         <Tabs tabs={previewTabs} active={activeTab} onChange={setActiveTab} />
         <div className="mt-6">
           <DataTable rows={tabs[activeTab as keyof typeof tabs]} preview />
         </div>
-        {message ? <p className="mt-4 text-sm text-orange-300">{message}</p> : null}
+        {message ? (
+          <p className="mt-4 text-sm text-orange-300">{message}</p>
+        ) : null}
       </Card>
     </div>
   );
@@ -140,7 +146,13 @@ function ProjectPreviewPageContent() {
 
 export default function ProjectPreviewPage() {
   return (
-    <Suspense fallback={<Card className="rounded-2xl p-6 text-sm text-slate-400">読み込み中...</Card>}>
+    <Suspense
+      fallback={
+        <Card className="rounded-2xl p-6 text-sm text-slate-400">
+          読み込み中...
+        </Card>
+      }
+    >
       <ProjectPreviewPageContent />
     </Suspense>
   );

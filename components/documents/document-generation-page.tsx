@@ -22,6 +22,7 @@ import {
   defaultTestViewpoints,
   documentCommonCopy,
 } from "@/lib/copy/document-page-copy";
+import { formatCount } from "@/lib/format-number";
 import { notifyWorkspaceTreeRefresh } from "@/lib/workspace-events";
 import type {
   DocumentSourceType,
@@ -157,11 +158,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
       triggerDownload(downloadUrl);
     } catch (err) {
       const formatted = formatApiError(err);
-      setError(
-        formatted.requestId
-          ? `${formatted.message} | Request ID: ${formatted.requestId}`
-          : formatted.message,
-      );
+      setError(formatted.message);
     } finally {
       window.clearInterval(timer);
       setSubmitting(false);
@@ -221,7 +218,7 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         {currentDocument?.grant ? (
           <p className="mt-2 text-sm text-amber-200">
             {documentCommonCopy.remainingGenerations}:{" "}
-            {currentDocument.grant.remainingGenerations}
+            {formatCount(currentDocument.grant.remainingGenerations)}
           </p>
         ) : null}
       </Card>
