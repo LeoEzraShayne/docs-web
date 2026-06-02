@@ -211,19 +211,13 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         <p className="mt-4 text-sm text-slate-300">
           {documentCommonCopy.projectPrefix}:{" "}
           {project?.docTitle ?? documentCommonCopy.loading}
-          {currentDocument?.grant ? (
-            <span className="ml-3 text-amber-200">
-              {documentCommonCopy.remainingGenerations}:{" "}
-              {currentDocument.grant.remainingGenerations}
-            </span>
-          ) : null}
         </p>
-        {currentDocument?.grant ? null : (
-          <p className="mt-2 text-xs text-slate-500">
+        {currentDocument?.grant ? (
+          <p className="mt-2 text-sm text-amber-200">
             {documentCommonCopy.remainingGenerations}:{" "}
-            -
+            {currentDocument.grant.remainingGenerations}
           </p>
-        )}
+        ) : null}
       </Card>
       <Card className="space-y-6 rounded-2xl p-6">
         <SourceSelector
