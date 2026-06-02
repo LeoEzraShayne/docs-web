@@ -1,4 +1,3 @@
-import { Button } from "@/components/button";
 import type { PurchaseHistoryResponse } from "@/lib/types";
 
 export const purchasePageSizes = [10, 30, 50];
@@ -30,10 +29,15 @@ export function PurchaseHistoryTable({
               </td>
               <td className="py-4 pr-4 text-slate-200">{item.productName}</td>
               <td className="py-4 pr-4 text-slate-300">
-                {item.documentTitle ?? "全文書"}
+                {item.projectTitle ? (
+                  <span className="block text-slate-200">{item.projectTitle}</span>
+                ) : null}
+                <span className="block">{item.documentTitle ?? "全文書"}</span>
               </td>
               <td className="py-4 pr-4 text-slate-200">
-                ¥{item.amountJpy.toLocaleString("ja-JP")}
+                {item.status === "applied"
+                  ? "購入済み枠"
+                  : `¥${item.amountJpy.toLocaleString("ja-JP")}`}
               </td>
               <td className="py-4 pr-4 text-slate-300">
                 {purchaseStatusLabel(item.status)}
@@ -58,42 +62,8 @@ export function PurchaseHistoryTable({
 
 function purchaseStatusLabel(status: string) {
   if (status === "paid") return "購入成功";
+  if (status === "applied") return "適用済み";
   if (status === "unpaid") return "未払い";
   if (status === "no_payment_required") return "支払い不要";
   return status;
-}
-
-export function Pagination({
-  history,
-  page,
-  onPage,
-}: {
-  history: PurchaseHistoryResponse | null;
-  page: number;
-  onPage: (page: number) => void;
-}) {
-  const totalPages = history?.totalPages ?? 1;
-  return (
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
-      <span>
-        {history?.total ?? 0}件中 {page} / {totalPages} ページ
-      </span>
-      <div className="flex gap-2">
-        <Button
-          variant="secondary"
-          disabled={page <= 1}
-          onClick={() => onPage(page - 1)}
-        >
-          前へ
-        </Button>
-        <Button
-          variant="secondary"
-          disabled={page >= totalPages}
-          onClick={() => onPage(page + 1)}
-        >
-          次へ
-        </Button>
-      </div>
-    </div>
-  );
 }

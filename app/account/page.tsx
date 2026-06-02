@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { Pagination } from "@/components/pagination";
 import { AccountSummary } from "@/components/account/account-summary";
 import { DocumentUsageTable } from "@/components/account/document-usage-table";
 import {
-  Pagination,
   purchasePageSizes,
   PurchaseHistoryTable,
 } from "@/components/account/purchase-history";
@@ -20,6 +20,8 @@ export default function AccountPage() {
   const [history, setHistory] = useState<PurchaseHistoryResponse | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [usagePage, setUsagePage] = useState(1);
+  const [usagePageSize, setUsagePageSize] = useState(10);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,6 +42,8 @@ export default function AccountPage() {
   }, [page, pageSize]);
 
   const summary = usage?.summary;
+  const usageTotal = usage?.documents.length ?? 0;
+  const usageTotalPages = Math.max(1, Math.ceil(usageTotal / usagePageSize));
 
   return (
     <AuthGate>
@@ -71,8 +75,34 @@ export default function AccountPage() {
         </Card>
 
         <Card className="rounded-2xl p-6">
-          <SectionTitle title="文書別利用状況" />
-          <DocumentUsageTable usage={usage} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionTitle title="文書別利用状況" />
+            <select
+              value={usagePageSize}
+              onChange={(event) => {
+                setUsagePageSize(Number(event.target.value));
+                setUsagePage(1);
+              }}
+              className="rounded-md border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-200"
+            >
+              {purchasePageSizes.map((size) => (
+                <option key={size} value={size}>
+                  {size}件
+                </option>
+              ))}
+            </select>
+          </div>
+          <DocumentUsageTable
+            usage={usage}
+            page={usagePage}
+            pageSize={usagePageSize}
+          />
+          <Pagination
+            page={usagePage}
+            total={usageTotal}
+            totalPages={usageTotalPages}
+            onPage={setUsagePage}
+          />
         </Card>
 
         <Card className="rounded-2xl p-6">
@@ -94,7 +124,12 @@ export default function AccountPage() {
             </select>
           </div>
           <PurchaseHistoryTable history={history} />
-          <Pagination history={history} page={page} onPage={setPage} />
+          <Pagination
+            page={page}
+            total={history?.total ?? 0}
+            totalPages={history?.totalPages ?? 1}
+            onPage={setPage}
+          />
         </Card>
       </div>
     </AuthGate>

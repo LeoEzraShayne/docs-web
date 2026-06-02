@@ -43,6 +43,7 @@ export type PurchaseHistoryResponse = {
     productName: string;
     documentType: DocumentType | null;
     documentTitle: string | null;
+    projectTitle: string | null;
     amountJpy: number;
     status: string;
     grantedContent: string;
@@ -69,6 +70,19 @@ export type ProjectSummary = {
   docTitle: string;
   updatedAt: string;
   status: "DRAFT" | "READY" | "ARCHIVED";
+};
+
+export type ProjectPageResponse = {
+  items: ProjectSummary[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  summary: {
+    total: number;
+    readyCount: number;
+    latestUpdatedAt: string | null;
+  };
 };
 
 export type ProjectDetail = {

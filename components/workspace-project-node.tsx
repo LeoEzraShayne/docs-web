@@ -14,6 +14,7 @@ export function WorkspaceProjectNode({
   activeProjectId,
   activeDocSlug,
   activeVersion,
+  pageQuery,
   onToggle,
 }: {
   projectId: string;
@@ -23,6 +24,7 @@ export function WorkspaceProjectNode({
   activeProjectId?: string;
   activeDocSlug?: string;
   activeVersion: string | null;
+  pageQuery: string;
   onToggle: () => void;
 }) {
   const isProjectActive = activeProjectId === projectId;
@@ -38,7 +40,7 @@ export function WorkspaceProjectNode({
           {expanded ? "▾" : "▸"}
         </button>
         <Link
-          href={`/app/projects/${projectId}`}
+          href={`/app/projects/${projectId}?${pageQuery}`}
           className={`min-w-0 flex-1 truncate text-sm ${
             isProjectActive ? "text-amber-200" : "text-slate-300"
           }`}
@@ -53,6 +55,7 @@ export function WorkspaceProjectNode({
           isProjectActive={isProjectActive}
           activeDocSlug={activeDocSlug}
           activeVersion={activeVersion}
+          pageQuery={pageQuery}
         />
       ) : null}
     </div>
@@ -65,12 +68,14 @@ function DocumentLinks({
   isProjectActive,
   activeDocSlug,
   activeVersion,
+  pageQuery,
 }: {
   projectId: string;
   tree: DocumentSummary[];
   isProjectActive: boolean;
   activeDocSlug?: string;
   activeVersion: string | null;
+  pageQuery: string;
 }) {
   return (
     <div className="space-y-1 px-3 pb-3 pl-8">
@@ -81,7 +86,7 @@ function DocumentLinks({
         return (
           <div key={doc.type}>
             <Link
-              href={`/app/projects/${projectId}/documents/${doc.slug}`}
+              href={`/app/projects/${projectId}/documents/${doc.slug}?${pageQuery}`}
               className={treeClass(docActive)}
             >
               {doc.label}
@@ -92,6 +97,7 @@ function DocumentLinks({
               docActive={docActive}
               activeVersion={activeVersion}
               versions={versions}
+              pageQuery={pageQuery}
             />
           </div>
         );
@@ -106,12 +112,14 @@ function VersionLinks({
   docActive,
   activeVersion,
   versions,
+  pageQuery,
 }: {
   projectId: string;
   docSlug: string;
   docActive: boolean;
   activeVersion: string | null;
   versions: DocumentSummary["versions"];
+  pageQuery: string;
 }) {
   if (!versions.length) return null;
   return (
@@ -121,7 +129,7 @@ function VersionLinks({
         return (
           <Link
             key={version.id}
-            href={`/app/projects/${projectId}/documents/${docSlug}?version=${label}`}
+            href={`/app/projects/${projectId}/documents/${docSlug}?${pageQuery}&version=${label}`}
             className={versionClass(docActive && activeVersion === label)}
           >
             {label}

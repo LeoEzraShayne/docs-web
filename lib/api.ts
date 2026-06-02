@@ -11,6 +11,7 @@ import type {
   DocumentVersionResult,
   GenerateDocumentPayload,
   ProjectDetail,
+  ProjectPageResponse,
   ProjectFormValues,
   ProjectSummary,
   ProjectVersionResponse,
@@ -73,6 +74,8 @@ export const api = {
       `/billing/purchases?page=${page}&pageSize=${pageSize}`,
     ),
   getProjects: () => request<ProjectSummary[]>("/projects"),
+  getProjectsPage: (page: number, pageSize: number) =>
+    request<ProjectPageResponse>(`/projects?page=${page}&pageSize=${pageSize}`),
   getProject: (id: string) => request<ProjectDetail>(`/projects/${id}`),
   getProjectVersion: (id: string, versionNo: number) =>
     request<ProjectVersionResponse>(`/projects/${id}/versions/${versionNo}`),

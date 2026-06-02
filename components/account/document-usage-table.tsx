@@ -3,11 +3,18 @@ import type { AccountUsageResponse } from "@/lib/types";
 
 export function DocumentUsageTable({
   usage,
+  page = 1,
+  pageSize,
 }: {
   usage: AccountUsageResponse | null;
+  page?: number;
+  pageSize?: number;
 }) {
   const showRemaining = !usage?.summary.hasBusinessPack;
-  const docs = usage?.documents ?? [];
+  const allDocs = usage?.documents ?? [];
+  const docs = pageSize
+    ? allDocs.slice((page - 1) * pageSize, page * pageSize)
+    : allDocs;
   return (
     <div className="mt-4 overflow-x-auto">
       <table className="w-full min-w-[720px] text-left text-sm">

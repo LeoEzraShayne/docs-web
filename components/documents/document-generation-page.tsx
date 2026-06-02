@@ -36,6 +36,14 @@ const SOURCE_DOC: Partial<Record<DocumentSourceType, DocumentType>> = {
   DETAILED_DESIGN_VERSION: "DETAILED_DESIGN",
 };
 
+const DOCUMENT_ROUTES: Record<DocumentType, string> = {
+  REQUIREMENTS: "requirements",
+  BASIC_DESIGN: "basic-design",
+  DETAILED_DESIGN: "detailed-design",
+  UNIT_TEST: "unit-test",
+  INTEGRATION_TEST: "integration-test",
+};
+
 export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   const params = useParams<{ id: string }>();
   const config = DOCUMENT_PAGE_CONFIGS[type];
@@ -180,6 +188,10 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
 
   async function purchase() {
     sessionStorage.setItem("pendingProjectId", params.id);
+    sessionStorage.setItem(
+      "pendingDocumentPath",
+      `/app/projects/${params.id}/documents/${DOCUMENT_ROUTES[type]}`,
+    );
     const checkout = await api.checkoutSingleDocument(type, {
       projectId: params.id,
       documentId: currentDocument?.id,
@@ -199,13 +211,19 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         <p className="mt-4 text-sm text-slate-300">
           {documentCommonCopy.projectPrefix}:{" "}
           {project?.docTitle ?? documentCommonCopy.loading}
+          {currentDocument?.grant ? (
+            <span className="ml-3 text-amber-200">
+              {documentCommonCopy.remainingGenerations}:{" "}
+              {currentDocument.grant.remainingGenerations}
+            </span>
+          ) : null}
         </p>
-        {currentDocument?.grant ? (
+        {currentDocument?.grant ? null : (
           <p className="mt-2 text-xs text-slate-500">
             {documentCommonCopy.remainingGenerations}:{" "}
-            {currentDocument.grant.remainingGenerations}
+            -
           </p>
-        ) : null}
+        )}
       </Card>
       <Card className="space-y-6 rounded-2xl p-6">
         <SourceSelector
