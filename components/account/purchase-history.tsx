@@ -29,10 +29,7 @@ export function PurchaseHistoryTable({
               </td>
               <td className="py-4 pr-4 text-slate-200">{item.productName}</td>
               <td className="py-4 pr-4 text-slate-300">
-                {item.projectTitle ? (
-                  <span className="block text-slate-200">{item.projectTitle}</span>
-                ) : null}
-                <span className="block">{item.documentTitle ?? "全文書"}</span>
+                {item.documentTitle ?? "全文書"}
               </td>
               <td className="py-4 pr-4 text-slate-200">
                 {item.status === "applied"

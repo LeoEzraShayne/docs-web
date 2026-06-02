@@ -69,13 +69,16 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
-    const [projectResponse, tree] = await Promise.all([
+    const [projectResponse, tree, current] = await Promise.all([
       api.getProject(params.id),
       api.getDocumentTree(params.id),
+      api.getDocument(params.id, type),
     ]);
     setProject(projectResponse);
-    setDocuments(tree);
-  }, [params.id]);
+    setDocuments(
+      tree.map((document) => (document.type === type ? current : document)),
+    );
+  }, [params.id, type]);
 
   useEffect(() => {
     void load();
@@ -192,9 +195,12 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
       "pendingDocumentPath",
       `/app/projects/${params.id}/documents/${DOCUMENT_ROUTES[type]}`,
     );
+    const document = currentDocument?.id
+      ? currentDocument
+      : await api.getDocument(params.id, type);
     const checkout = await api.checkoutSingleDocument(type, {
       projectId: params.id,
-      documentId: currentDocument?.id,
+      documentId: document.id,
     });
     window.location.href = checkout.url;
   }

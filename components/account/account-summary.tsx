@@ -1,12 +1,17 @@
 import type { AccountUsageResponse } from "@/lib/types";
 
-export function AccountSummary({ usage }: { usage: AccountUsageResponse | null }) {
+export function AccountSummary({
+  usage,
+}: {
+  usage: AccountUsageResponse | null;
+}) {
   const summary = usage?.summary;
   const business = summary?.businessPack;
   const nextExpiringDocument = summary?.nextExpiringDocument;
-  const cards = summary?.hasBusinessPack
+  const single = summary?.singleDocumentPack;
+  const businessCards = summary?.hasBusinessPack
     ? [
-        ["現在の利用形態", "Business Pack"],
+        ["利用形態", "Business Pack"],
         [
           "未開始文書枠",
           business
@@ -16,26 +21,72 @@ export function AccountSummary({ usage }: { usage: AccountUsageResponse | null }
         ["生成済み文書数", String(business?.startedDocumentCount ?? 0)],
         ["有効期限", formatDate(business?.expiresAt)],
       ]
-    : [
-        [
-          "現在の利用形態",
-          summary?.planType === "ONESHOT"
-            ? "Docs Single"
-            : (summary?.planType ?? "-"),
-        ],
-        ["利用中の文書数", String(usage?.documents.length ?? 0)],
+    : [];
+  const singleCards = single
+    ? [
+        ["利用形態", "Docs Single"],
+        ["購入済み文書数", String(single.purchasedDocumentCount)],
+        ["未使用文書枠", String(single.unstartedDocumentCredits)],
         [
           "次に失効する文書",
-          nextExpiringDocument
-            ? `${nextExpiringDocument.documentTitle}：${formatDate(
-                nextExpiringDocument.expiresAt,
+          single.nextExpiringDocument
+            ? `${single.nextExpiringDocument.documentTitle}：${formatDate(
+                single.nextExpiringDocument.expiresAt,
               )}`
             : "未設定",
         ],
-      ];
+      ]
+    : summary?.hasBusinessPack
+      ? []
+      : [
+          [
+            "利用形態",
+            summary?.planType === "ONESHOT"
+              ? "Docs Single"
+              : (summary?.planType ?? "-"),
+          ],
+          ["利用中の文書数", String(usage?.documents.length ?? 0)],
+          [
+            "次に失効する文書",
+            nextExpiringDocument
+              ? `${nextExpiringDocument.documentTitle}：${formatDate(
+                  nextExpiringDocument.expiresAt,
+                )}`
+              : "未設定",
+          ],
+        ];
 
   return (
-    <div className="mt-6 grid gap-4 md:grid-cols-3">
+    <div className="mt-6 space-y-4">
+      {businessCards.length ? (
+        <SummarySection
+          cards={businessCards}
+          columns="md:grid-cols-2 xl:grid-cols-4"
+        />
+      ) : null}
+      {singleCards.length ? (
+        <SummarySection
+          cards={singleCards}
+          columns={
+            summary?.hasBusinessPack
+              ? "md:grid-cols-2 xl:grid-cols-4"
+              : "md:grid-cols-3"
+          }
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function SummarySection({
+  cards,
+  columns,
+}: {
+  cards: string[][];
+  columns: string;
+}) {
+  return (
+    <div className={`grid gap-4 ${columns}`}>
       {cards.map(([label, value]) => (
         <div
           key={label}

@@ -23,10 +23,6 @@ export default function SuccessPage() {
       );
       const stored = sessionStorage.getItem("pendingProjectId");
       const storedDocumentPath = sessionStorage.getItem("pendingDocumentPath");
-      if (!stored) {
-        setConfirmed(true);
-        return;
-      }
       if (storedDocumentPath) {
         setPendingDocumentPath(storedDocumentPath);
       }
@@ -37,7 +33,7 @@ export default function SuccessPage() {
       void confirm
         .then(() => {
           setMessage("購入内容を反映しました。");
-          return api.getDocumentTree(stored);
+          return stored ? api.getDocumentTree(stored) : Promise.resolve(null);
         })
         .then(() => setConfirmed(true))
         .catch(() =>
