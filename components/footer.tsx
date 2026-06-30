@@ -33,8 +33,11 @@ export function Footer() {
             <div className="mt-3 flex flex-wrap gap-4">
               <Link href="/pricing">料金</Link>
               <Link href="/demo">デモ</Link>
-              <Link href="/blog/requirements-definition-template">
+              <Link href="/requirements-definition-template">
                 要件定義書テンプレート
+              </Link>
+              <Link href="/meeting-notes-to-requirements-definition">
+                会議メモから要件定義書
               </Link>
             </div>
           </div>

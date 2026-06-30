@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import {
   absoluteUrl,
-  blogRequirementsTemplate,
   landingPages,
+  meetingNotesToRequirementsPage,
+  requirementsDefinitionTemplatePage,
 } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -12,8 +13,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/pricing",
     "/demo",
     "/contact",
+    requirementsDefinitionTemplatePage.slug,
+    meetingNotesToRequirementsPage.slug,
     ...landingPages.map((page) => page.slug),
-    blogRequirementsTemplate.slug,
   ];
 
   return routes.map((route) => ({

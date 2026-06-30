@@ -240,6 +240,20 @@ export const blogRequirementsTemplate = {
     "要件定義書テンプレートの基本項目、書き方、レビュー観点を日本のシステム開発向けに解説。AIで要件定義書を作成する場合の入力情報も整理します。",
 };
 
+export const requirementsDefinitionTemplatePage = {
+  slug: "/requirements-definition-template",
+  title: "要件定義書テンプレート｜無料で見られるExcel構成・記入例付き",
+  description:
+    "システム開発で使える要件定義書テンプレートの構成例を無料で確認できます。基本情報、業務要件、機能要件、非機能要件、画面一覧、帳票一覧、制約事項まで、記入例付きで解説します。",
+};
+
+export const meetingNotesToRequirementsPage = {
+  slug: "/meeting-notes-to-requirements-definition",
+  title: "会議メモから要件定義書を自動生成する方法｜AI活用例",
+  description:
+    "会議メモやヒアリング内容から、背景、目的、スコープ、機能要件、非機能要件を整理して要件定義書にまとめる方法を解説します。AIで初稿を作成する活用例も紹介します。",
+};
+
 export function absoluteUrl(path = "/") {
   return new URL(path, siteUrl).toString();
 }
