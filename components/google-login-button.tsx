@@ -25,7 +25,10 @@ declare global {
   }
 }
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const PUBLIC_GOOGLE_CLIENT_ID =
+  "692705532429-vln2fhilsu85c1sjia0uftafigsmembn.apps.googleusercontent.com";
+const CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? PUBLIC_GOOGLE_CLIENT_ID;
 
 export function GoogleLoginButton({
   redirectTo = "/app",
