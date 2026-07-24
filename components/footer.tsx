@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
+import { TrackedLink } from "@/components/seo/tracked-link";
 
 const supportEmail =
   process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@docs.meritledger.org";
@@ -31,14 +33,18 @@ export function Footer() {
               リソース
             </p>
             <div className="mt-3 flex flex-wrap gap-4">
-              <Link href="/pricing">料金</Link>
-              <Link href="/demo">デモ</Link>
+              <TrackedLink href="/pricing" eventName="seo_pricing_click" ctaPosition="footer" variant="text">料金</TrackedLink>
+              <TrackedLink href="/demo" eventName="seo_demo_click" ctaPosition="footer" variant="text">デモ</TrackedLink>
               <Link href="/requirements-definition-template">
                 要件定義書テンプレート
               </Link>
               <Link href="/meeting-notes-to-requirements-definition">
                 会議メモから要件定義書
               </Link>
+              <Link href="/requirements-definition-sample">要件定義書サンプル</Link>
+              <Link href="/requirements-definition-how-to-write">要件定義書の書き方</Link>
+              <Link href="/requirements-definition-tools">要件定義ツール比較</Link>
+              <Link href="/requirements-definition-checklist">要件定義チェックリスト</Link>
             </div>
           </div>
           <div>
@@ -50,6 +56,7 @@ export function Footer() {
               <Link href="/privacy">プライバシーポリシー</Link>
               <Link href="/specified-commercial-transaction">特定商取引法</Link>
               <Link href="/contact">お問い合わせ</Link>
+              <CookieSettingsButton />
             </div>
           </div>
         </div>

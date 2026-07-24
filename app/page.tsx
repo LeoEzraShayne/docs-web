@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { Card } from "@/components/card";
-import { Button } from "@/components/button";
 import { SectionTitle } from "@/components/section-title";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackedLink } from "@/components/seo/tracked-link";
 import {
   softwareApplicationJsonLd,
   websiteJsonLd,
@@ -27,15 +26,9 @@ export default function HomePage() {
             body="日本のシステム開発現場向けに、要件定義書、基本設計書、詳細設計書、単体テスト仕様書、結合テスト仕様書のたたき台をAIで整理します。プレビュー確認後にExcel出力でき、再生成と履歴管理にも対応します。"
           />
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/login">
-              <Button>ログインして作成する</Button>
-            </Link>
-            <Link href="/demo">
-              <Button variant="secondary">デモで試す</Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="ghost">料金を見る</Button>
-            </Link>
+            <TrackedLink href="/login" eventName="seo_signup_click" ctaPosition="home:hero">ログインして作成する</TrackedLink>
+            <TrackedLink href="/demo" eventName="seo_demo_click" ctaPosition="home:hero" variant="secondary">デモで試す</TrackedLink>
+            <TrackedLink href="/pricing" eventName="seo_pricing_click" ctaPosition="home:hero" variant="ghost">料金を見る</TrackedLink>
           </div>
           <div className="mt-10 grid gap-3 md:grid-cols-3">
             {highlights.map((item) => (
@@ -97,6 +90,32 @@ export default function HomePage() {
             <p className="mt-3 text-sm leading-7 text-slate-300">{item.body}</p>
           </Card>
         ))}
+      </section>
+
+      <section>
+        <SectionTitle
+          kicker="Requirements Resources"
+          title="要件定義の無料リソース"
+          body="書き方を確認し、サンプルで粒度をつかみ、Excelテンプレートとチェックリストでレビューまで進められます。"
+        />
+        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            ["要件定義書テンプレート", "Excel構成と記入例。無料ファイルもダウンロードできます。", "/requirements-definition-template"],
+            ["要件定義書サンプル", "Webシステム案件の機能・非機能・連携・リスクの記入例。", "/requirements-definition-sample"],
+            ["要件定義書の書き方", "ヒアリングからレビュー、合意、基本設計への引継ぎまで。", "/requirements-definition-how-to-write"],
+            ["要件定義ツール比較", "Excel、共同編集文書、生成AI、専用AIの選び方。", "/requirements-definition-tools"],
+            ["レビュー用チェックリスト", "範囲、機能、非機能、移行、未決事項を確認。", "/requirements-definition-checklist"],
+            ["会議メモから要件定義", "発言を背景、目的、要件、制約へ整理する具体例。", "/meeting-notes-to-requirements-definition"],
+          ].map(([title, body, href]) => (
+            <Card key={href} className="rounded-2xl p-6">
+              <h2 className="text-lg font-semibold text-slate-50">{title}</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-400">{body}</p>
+              <TrackedLink className="mt-4" variant="text" eventName="seo_demo_click" ctaPosition="home:resource-card" href={href}>
+                詳しく見る →
+              </TrackedLink>
+            </Card>
+          ))}
+        </div>
       </section>
     </div>
   );

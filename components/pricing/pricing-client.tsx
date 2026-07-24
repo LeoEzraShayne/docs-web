@@ -9,6 +9,7 @@ import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { documentTypeOptions } from "@/lib/document-labels";
 import type { DocumentType } from "@/lib/types";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 type Plan = {
   name: string;
@@ -67,6 +68,12 @@ export function PricingClient() {
         action === "business"
           ? await api.checkoutBusinessPack()
           : await api.checkoutSingleDocument(singleType);
+      trackAnalyticsEvent("checkout_start", {
+        pagePath: "/pricing",
+        ctaPosition: "pricing-card",
+        planType: action,
+        ...(action === "single" ? { documentType: singleType } : {}),
+      });
       window.location.assign(response.url);
     } catch (err) {
       const formatted = formatApiError(err);

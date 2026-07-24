@@ -2,6 +2,7 @@ import { Button } from "@/components/button";
 import { api } from "@/lib/api";
 import { documentCommonCopy } from "@/lib/copy/document-page-copy";
 import type { DocumentSummary, DocumentType } from "@/lib/types";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 export function SheetSelector({
   sheets,
@@ -82,7 +83,7 @@ export function ResultPanel({
       <p className="mt-1 text-xs text-emerald-200/80">
         {documentCommonCopy.downloadStarted}
       </p>
-      <a className="mt-3 inline-flex" href={downloadUrl}>
+      <a className="mt-3 inline-flex" href={downloadUrl} onClick={() => trackAnalyticsEvent("generated_excel_download", { pagePath: window.location.pathname, ctaPosition: "generation-success:redownload", assetName: "generated-document.xlsx" })}>
         <Button variant="secondary">{documentCommonCopy.redownload}</Button>
       </a>
     </div>
@@ -113,6 +114,7 @@ export function VersionsPanel({
                 type,
                 version.versionNo,
               )}
+              onClick={() => trackAnalyticsEvent("generated_excel_download", { pagePath: window.location.pathname, ctaPosition: "version-history:redownload", documentType: type, assetName: "generated-document.xlsx" })}
             >
               <Button variant="ghost">{documentCommonCopy.redownload}</Button>
             </a>

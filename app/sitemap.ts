@@ -15,6 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
     requirementsDefinitionTemplatePage.slug,
     meetingNotesToRequirementsPage.slug,
+    "/requirements-definition-sample",
+    "/requirements-definition-tools",
+    "/requirements-definition-how-to-write",
+    "/requirements-definition-checklist",
     ...landingPages.map((page) => page.slug),
   ];
 

@@ -8,13 +8,16 @@ import { api, formatApiError } from "@/lib/api";
 import { projectFormPageCopy } from "@/lib/copy/project-form-copy";
 import { notifyWorkspaceTreeRefresh } from "@/lib/workspace-events";
 import type { ProjectFormValues } from "@/lib/types";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 export default function NewProjectPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
   async function createProject(values: ProjectFormValues) {
-    return api.createProject(values);
+    const created = await api.createProject(values);
+    trackAnalyticsEvent("project_create", { pagePath: "/app/new", ctaPosition: "project-form" });
+    return created;
   }
 
   async function handlePreview(values: ProjectFormValues) {

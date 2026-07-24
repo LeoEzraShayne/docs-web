@@ -3,7 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackedLink } from "@/components/seo/tracked-link";
 import {
+  articleJsonLd,
+  breadcrumbJsonLd,
   faqJsonLd,
   pageMetadata,
   requirementsDefinitionTemplatePage,
@@ -38,7 +41,7 @@ const faq = [
   {
     question: "このページのテンプレートは無料で確認できますか？",
     answer:
-      "はい。要件定義書に含める項目、構成例、記入例をページ上で無料で確認できます。Excelファイルの配布は行っていません。",
+      "はい。ページ上の構成例に加え、空欄シートと記入例を収録した編集可能なExcelテンプレートを、ログイン不要で無料ダウンロードできます。",
   },
   {
     question: "要件定義書テンプレートには何を書けばよいですか？",
@@ -62,6 +65,22 @@ export default function RequirementsDefinitionTemplatePage() {
   return (
     <article className="space-y-8 py-8">
       <JsonLd data={faqJsonLd(faq)} />
+      <JsonLd
+        data={articleJsonLd({
+          title: requirementsDefinitionTemplatePage.title,
+          description: requirementsDefinitionTemplatePage.description,
+          path: requirementsDefinitionTemplatePage.slug,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "ホーム", path: "/" },
+          {
+            name: requirementsDefinitionTemplatePage.title,
+            path: requirementsDefinitionTemplatePage.slug,
+          },
+        ])}
+      />
       <Card className="micro-grid rounded-2xl p-8 md:p-10">
         <p className="text-xs uppercase tracking-[0.28em] text-amber-300">
           Requirements Template
@@ -73,15 +92,57 @@ export default function RequirementsDefinitionTemplatePage() {
           システム開発で使う要件定義書の構成例を、Excelで整理しやすい粒度でまとめています。基本情報、業務要件、機能要件、非機能要件、画面一覧、帳票一覧、制約事項まで、記入例とあわせて確認できます。
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/login">
-            <Button>AIで要件定義書を作成する</Button>
-          </Link>
+          <TrackedLink
+            href="/requirements-definition-template-ja.xlsx"
+            download="requirements-definition-template-ja.xlsx"
+            eventName="template_download"
+            ctaPosition="requirements-template:hero"
+            assetName="requirements-definition-template-ja.xlsx"
+          >
+            Excelテンプレートを無料ダウンロード
+          </TrackedLink>
           <Link href="/requirements-definition-ai">
             <Button variant="secondary">AI生成ページを見る</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="ghost">料金を見る</Button>
           </Link>
+        </div>
+      </Card>
+
+      <Card className="rounded-2xl border-amber-400/20 p-8">
+        <h2 className="text-2xl font-bold text-slate-50">
+          無料Excelテンプレートの内容
+        </h2>
+        <p className="mt-4 text-sm leading-7 text-slate-300">
+          製品が生成する12シートに、レビュー・チェックリストと記入例を加えた全14シートを収録しています。案件に不要な項目は理由を残して対象外とし、生成物をそのまま承認せず関係者でレビューしてください。
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <TrackedLink
+            href="/requirements-definition-template-ja.xlsx"
+            download="requirements-definition-template-ja.xlsx"
+            eventName="template_download"
+            ctaPosition="requirements-template:download-section"
+            assetName="requirements-definition-template-ja.xlsx"
+          >
+            ログインせずにダウンロード
+          </TrackedLink>
+          <TrackedLink
+            href="/demo"
+            eventName="seo_demo_click"
+            ctaPosition="requirements-template:download-section"
+            variant="secondary"
+          >
+            無料デモを試す
+          </TrackedLink>
+          <TrackedLink
+            href="/login"
+            eventName="seo_signup_click"
+            ctaPosition="requirements-template:download-section"
+            variant="ghost"
+          >
+            AIで要件定義書を作成する
+          </TrackedLink>
         </div>
       </Card>
 
@@ -117,12 +178,10 @@ export default function RequirementsDefinitionTemplatePage() {
           </h2>
           <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-300">
             {[
-              "表紙・改訂履歴",
-              "目的・背景・スコープ",
-              "業務フロー・利用者ロール",
-              "機能一覧・画面一覧・帳票一覧",
-              "非機能要件・外部連携・制約事項",
-              "リスク・未決事項・用語集",
+              "1. 項目概要", "2. スコープ定義", "3. 業務要件", "4. 機能要件一覧",
+              "5. 画面一覧", "6. 画面概要", "7. 権限一覧", "8. データ項目定義",
+              "9. 外部連携・API一覧", "10. 非機能要件", "11. 業務フロー", "12. 課題・リスク一覧",
+              "13. レビュー・チェックリスト", "14. 記入例",
             ].map((item) => (
               <li key={item} className="border-l border-amber-300/40 pl-3">
                 {item}

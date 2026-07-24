@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
+import { AnalyticsConsent } from "@/components/analytics-consent";
 import { homeDescription, homeTitle, siteName, siteUrl } from "@/lib/seo";
 
 const noto = Noto_Sans_JP({
@@ -54,6 +55,7 @@ export default function RootLayout({
             <SiteHeader />
             <main className="page-shell">{children}</main>
             <Footer />
+            <AnalyticsConsent />
           </div>
         </AuthProvider>
       </body>

@@ -9,6 +9,7 @@ import { Tabs } from "@/components/tabs";
 import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { GenerateResponse } from "@/lib/types";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const demoTabs = [
   { key: "flow", label: "FLOW" },
@@ -78,7 +79,7 @@ export default function DemoPage() {
             </p>
           </div>
           <div className="text-right">
-            <Link href={createHref}>
+            <Link href={createHref} onClick={() => trackAnalyticsEvent("seo_signup_click", { pagePath: "/demo", ctaPosition: "demo:hero" })}>
               <Button>自分の資料で作成する</Button>
             </Link>
             <p className="mt-2 text-xs text-slate-500">

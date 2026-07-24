@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackedLink } from "@/components/seo/tracked-link";
 import {
   faqJsonLd,
   meetingNotesToRequirementsPage,
@@ -73,15 +74,11 @@ export default function MeetingNotesToRequirementsDefinitionPage() {
           ヒアリングや定例会のメモを、背景、目的、スコープ、機能要件、非機能要件、制約条件に分けて整理すると、要件定義書の初稿にしやすくなります。ここでは会議メモの例から要件定義書へ変換する流れを紹介します。
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/login">
-            <Button>会議メモから作成する</Button>
-          </Link>
+          <TrackedLink href="/login" eventName="seo_signup_click" ctaPosition="meeting-notes:hero">会議メモから作成する</TrackedLink>
           <Link href="/requirements-definition-template">
             <Button variant="secondary">テンプレートを見る</Button>
           </Link>
-          <Link href="/pricing">
-            <Button variant="ghost">料金を見る</Button>
-          </Link>
+          <TrackedLink href="/pricing" eventName="seo_pricing_click" ctaPosition="meeting-notes:hero" variant="ghost">料金を見る</TrackedLink>
         </div>
       </Card>
 

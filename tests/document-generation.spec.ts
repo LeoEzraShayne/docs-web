@@ -49,6 +49,24 @@ async function mockApi(
       ],
     }),
   );
+  await page.route(`${API}/projects?page=1&pageSize=12`, (route) =>
+    route.fulfill({
+      json: {
+        items: [
+          {
+            id: "project-1",
+            docTitle: "テスト案件",
+            updatedAt: "2026-05-30T00:00:00.000Z",
+            status: "READY",
+          },
+        ],
+        page: 1,
+        pageSize: 12,
+        total: 1,
+        totalPages: 1,
+      },
+    }),
+  );
   await page.route(`${API}/projects/project-1`, (route) =>
     route.fulfill({
       json: {
@@ -64,6 +82,12 @@ async function mockApi(
     options.treeRequests?.push("tree");
     return route.fulfill({ json: documents });
   });
+  for (const document of documents) {
+    await page.route(
+      `${API}/projects/project-1/documents/${document.type}`,
+      (route) => route.fulfill({ json: document }),
+    );
+  }
   await page.route(
     `${API}/projects/project-1/documents/**/generate`,
     (route) => {
@@ -129,7 +153,9 @@ test("shows workspace project document tree navigation", async ({ page }) => {
 
   await expect(page.getByText("新規案件")).toBeVisible();
   await expect(page.getByText("案件一覧")).toBeVisible();
-  await expect(page.getByText("アカウント")).toBeVisible();
+  await expect(
+    page.getByRole("complementary").getByRole("link", { name: "アカウント" }),
+  ).toBeVisible();
   await expect(page.getByText("Projects", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "テスト案件" })).toBeVisible();
 
@@ -140,20 +166,27 @@ test("shows workspace project document tree navigation", async ({ page }) => {
     "単体テスト仕様書",
     "結合テスト仕様書",
   ]) {
-    await expect(page.getByRole("link", { name: label })).toBeVisible();
+    await expect(
+      page.getByRole("complementary").getByRole("link", {
+        name: label,
+        exact: true,
+      }),
+    ).toBeVisible();
   }
 
-  const version = page.getByRole("link", { name: "v1" }).first();
+  const version = page.locator(
+    'aside a[href="/app/projects/project-1/documents/requirements?page=1&pageSize=12&version=v1"]',
+  );
   await expect(version).toHaveAttribute(
     "href",
-    /\/app\/projects\/project-1\/documents\/requirements\?version=v1$/,
+    /\/app\/projects\/project-1\/documents\/requirements\?page=1&pageSize=12&version=v1$/,
   );
   await expect(version).toHaveClass(/text-amber-200/);
 });
 
 test("shows and hides source-specific fields", async ({ page }) => {
   await page.goto("/app/projects/project-1/documents/basic-design");
-  await expect(page.getByText("バージョン", { exact: true })).toBeVisible();
+  await expect(page.getByText("まだバージョンはありません。")).toBeVisible();
   await expect(page.getByText("システム構成要件")).toHaveCount(0);
   await page.getByLabel("入力ソース").selectOption("DIRECT_INPUT");
   await expect(page.getByText("システム構成要件")).toBeVisible();
@@ -180,6 +213,11 @@ test("generates, keeps success state, and refreshes versions", async ({
   await page.unroute(`${API}/projects/project-1/documents/tree`);
   await page.unroute(`${API}/projects/project-1/documents/**/generate`);
   await mockApi(page, { treeRequests });
+  await page.addInitScript(() => {
+    localStorage.setItem("docs-analytics-consent", "accepted");
+    (window as typeof window & { capturedEvents: unknown[][] }).capturedEvents = [];
+    window.gtag = (...args: unknown[]) => (window as typeof window & { capturedEvents: unknown[][] }).capturedEvents.push(args);
+  });
 
   await page.goto("/app/projects/project-1/documents/requirements");
   await page.getByLabel("解決したい課題").fill("課題");
@@ -194,6 +232,15 @@ test("generates, keeps success state, and refreshes versions", async ({
     page.getByRole("button", { name: "再ダウンロード" }).first(),
   ).toBeVisible();
   await expect.poll(() => treeRequests.length).toBeGreaterThan(1);
+  const events = await page.evaluate(() => [
+    ...(window as typeof window & { capturedEvents: unknown[][] }).capturedEvents,
+    ...((window.dataLayer ?? []).map((event) => Array.from(event as ArrayLike<unknown>))),
+  ].map((event) => event[1]));
+  if (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
+    expect(events).toEqual(expect.arrayContaining(["document_generate_start", "document_generate_success", "generated_excel_download"]));
+  } else {
+    expect(events).toEqual([]);
+  }
 });
 
 test("validates custom sheet selection before generation", async ({ page }) => {

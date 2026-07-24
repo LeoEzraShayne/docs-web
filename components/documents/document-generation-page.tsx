@@ -30,6 +30,7 @@ import type {
   DocumentType,
   ProjectDetail,
 } from "@/lib/types";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const SOURCE_DOC: Partial<Record<DocumentSourceType, DocumentType>> = {
   REQUIREMENTS_VERSION: "REQUIREMENTS",
@@ -131,6 +132,11 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
       setSubmitting(true);
       setError(null);
       setResult(null);
+      trackAnalyticsEvent("document_generate_start", {
+        pagePath: window.location.pathname,
+        documentType: type,
+        generationMode: mode,
+      });
       const result = await api.generateDocument(
         params.id,
         type,
@@ -155,6 +161,11 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
         result.versionNo,
       );
       setResult({ versionNo: result.versionNo, downloadUrl });
+      trackAnalyticsEvent("document_generate_success", {
+        pagePath: window.location.pathname,
+        documentType: type,
+        generationMode: mode,
+      });
       triggerDownload(downloadUrl);
     } catch (err) {
       const formatted = formatApiError(err);
@@ -166,6 +177,12 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
   }
 
   function triggerDownload(downloadUrl: string) {
+    trackAnalyticsEvent("generated_excel_download", {
+      pagePath: window.location.pathname,
+      ctaPosition: "generation-success:auto-download",
+      documentType: type,
+      assetName: "generated-document.xlsx",
+    });
     const link = window.document.createElement("a");
     link.href = downloadUrl;
     link.download = "";
@@ -198,6 +215,12 @@ export function DocumentGenerationPage({ type }: { type: DocumentType }) {
     const checkout = await api.checkoutSingleDocument(type, {
       projectId: params.id,
       documentId: document.id,
+    });
+    trackAnalyticsEvent("checkout_start", {
+      pagePath: window.location.pathname,
+      ctaPosition: "document-generation:purchase",
+      documentType: type,
+      planType: "single",
     });
     window.location.href = checkout.url;
   }

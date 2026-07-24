@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/card";
 import { Button } from "@/components/button";
 import { api } from "@/lib/api";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 export default function SuccessPage() {
+  const purchaseTracked = useRef(false);
   const [pendingProjectId, setPendingProjectId] = useState<string | null>(null);
   const [pendingDocumentPath, setPendingDocumentPath] = useState<string | null>(
     null,
@@ -33,6 +35,13 @@ export default function SuccessPage() {
       void confirm
         .then(() => {
           setMessage("購入内容を反映しました。");
+          if (sessionId && !purchaseTracked.current) {
+            purchaseTracked.current = true;
+            trackAnalyticsEvent("purchase_success", {
+              pagePath: "/success",
+              ctaPosition: "checkout-confirmation",
+            });
+          }
           return stored ? api.getDocumentTree(stored) : Promise.resolve(null);
         })
         .then(() => setConfirmed(true))

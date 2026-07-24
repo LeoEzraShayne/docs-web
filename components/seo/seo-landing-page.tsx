@@ -1,7 +1,6 @@
-import Link from "next/link";
-import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackedLink } from "@/components/seo/tracked-link";
 import { faqJsonLd, type SeoLandingPage } from "@/lib/seo";
 
 export function SeoLandingPage({ page }: { page: SeoLandingPage }) {
@@ -19,15 +18,9 @@ export function SeoLandingPage({ page }: { page: SeoLandingPage }) {
           {page.intro}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/login">
-            <Button>ログインして作成する</Button>
-          </Link>
-          <Link href="/demo">
-            <Button variant="secondary">デモで試す</Button>
-          </Link>
-          <Link href="/pricing">
-            <Button variant="ghost">料金を見る</Button>
-          </Link>
+          <TrackedLink href="/login" eventName="seo_signup_click" ctaPosition="ai-landing:hero">ログインして作成する</TrackedLink>
+          <TrackedLink href="/demo" eventName="seo_demo_click" ctaPosition="ai-landing:hero" variant="secondary">デモで試す</TrackedLink>
+          <TrackedLink href="/pricing" eventName="seo_pricing_click" ctaPosition="ai-landing:hero" variant="ghost">料金を見る</TrackedLink>
         </div>
       </Card>
 
