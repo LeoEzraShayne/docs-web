@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import catalog from "../lib/generated/document-catalog.v1.json";
+
+const requirementsSheets = catalog.documents.REQUIREMENTS.sheets;
 
 const resources = [
   {
@@ -83,18 +86,9 @@ test("Excel template downloads without authentication", async ({ request }) => {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(bytes);
   const expected = [
-    ["項目概要", ["No", "項目", "内容"]],
-    ["スコープ定義", ["No", "区分", "対象", "説明"]],
-    ["業務要件", ["No", "業務", "課題", "要件"]],
-    ["機能要件一覧", ["No", "機能名", "目的", "概要", "優先度"]],
-    ["画面一覧", ["No", "画面ID", "画面名", "目的", "主な機能"]],
-    ["画面概要", ["No", "画面名", "利用者", "概要"]],
-    ["権限一覧", ["No", "ロール名", "利用可能機能"]],
-    ["データ項目定義", ["No", "エンティティ名", "目的", "主なデータ項目"]],
-    ["外部連携・API一覧", ["No", "API名", "目的", "呼出元", "呼出先", "業務説明"]],
-    ["非機能要件", ["No", "分類", "要件", "説明"]],
-    ["業務フロー", ["No", "ステップ", "担当", "内容"]],
-    ["課題・リスク一覧", ["No", "分類", "内容", "影響"]],
+    ...requirementsSheets.map(
+      (sheet) => [sheet.workbookName, sheet.columns] as const,
+    ),
     ["レビュー・チェックリスト", ["分類", "チェック項目", "状態", "確認者", "確認日", "備考"]],
     ["記入例", ["分類", "項目", "記入例", "受入・確認条件", "状態", "備考"]],
   ] as const;
@@ -103,6 +97,66 @@ test("Excel template downloads without authentication", async ({ request }) => {
     expect(headers.map((_, index) => workbook.getWorksheet(name)?.getRow(4).getCell(index + 1).text)).toEqual(headers);
   }
   expect(workbook.getWorksheet("レビュー・チェックリスト")?.getCell("C5").dataValidation.type).toBe("list");
+});
+
+test("formal requirements sample Excel matches the 12-sheet product contract", async ({
+  request,
+  page,
+}) => {
+  const response = await request.get("/requirements-definition-sample-ja.xlsx");
+  expect(response.ok()).toBeTruthy();
+  expect(response.headers()["content-type"]).toContain(
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  );
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(await response.body());
+  const expectedNames = requirementsSheets.map((sheet) => sheet.workbookName);
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(expectedNames);
+  expect(workbook.worksheets.every((sheet) => sheet.rowCount >= 5)).toBe(true);
+
+  await page.goto("/requirements-definition-sample");
+  await expect(
+    page.getByRole("link", { name: "サンプルExcelを無料ダウンロード" }),
+  ).toHaveAttribute("href", "/requirements-definition-sample-ja.xlsx");
+  for (const name of expectedNames) {
+    await expect(page.getByRole("heading", { name: new RegExp(name) })).toBeVisible();
+  }
+});
+
+test("all five AI landing pages expose the real product sheet contract", async ({
+  page,
+}) => {
+  const pages = [
+    ["/requirements-definition-ai", 12, "外部連携・API一覧"],
+    ["/basic-design-ai", 10, "バッチ・帳票設計"],
+    ["/detailed-design-ai", 9, "メッセージ設計"],
+    ["/unit-test-spec-ai", 3, "DBテスト"],
+    ["/integration-test-spec-ai", 1, "業務シナリオテスト"],
+  ] as const;
+
+  for (const [path, sheetCount, finalSheet] of pages) {
+    await page.goto(path);
+    await expect(
+      page.getByRole("heading", {
+        name: `製品が生成する正式${sheetCount}シート`,
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: new RegExp(finalSheet) })).toBeVisible();
+    await expect(page.getByText("Product document contract v1")).toBeVisible();
+  }
+
+  await page.goto("/requirements-definition-ai");
+  await expect(page.getByText("用語集")).toHaveCount(0);
+});
+
+test("meeting notes page maps raw information to real target sheets and columns", async ({
+  page,
+}) => {
+  await page.goto("/meeting-notes-to-requirements-definition");
+  await expect(page.getByRole("columnheader", { name: "会議メモの原始情報" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "対象シート" })).toBeVisible();
+  await expect(page.getByText("外部連携・API一覧", { exact: true })).toBeVisible();
+  await expect(page.getByText("API名 / 目的 / 呼出元 / 呼出先 / 業務説明")).toBeVisible();
 });
 
 test("interactive checklist persists, copies, exports, and resets locally", async ({
@@ -185,6 +239,36 @@ test("analytics emits once only after consent", async ({ page }) => {
     ...((window.dataLayer ?? []).map((event) => Array.from(event as ArrayLike<unknown>))),
   ]);
   expect(events.filter((event) => event[0] === "event" && event[1] === "seo_demo_click")).toHaveLength(1);
+});
+
+test("sample download emits its dedicated analytics event once", async ({
+  page,
+}) => {
+  test.skip(
+    !process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+    "GA4 Measurement ID is required for event emission",
+  );
+  await page.addInitScript(() => {
+    localStorage.setItem("docs-analytics-consent", "accepted");
+    (window as typeof window & { capturedEvents: unknown[][] }).capturedEvents = [];
+    window.gtag = (...args: unknown[]) =>
+      (window as typeof window & { capturedEvents: unknown[][] }).capturedEvents.push(args);
+  });
+  await page.goto("/requirements-definition-sample");
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("link", { name: "サンプルExcelを無料ダウンロード" }).click();
+  await downloadPromise;
+  const events = await page.evaluate(() => [
+    ...(window as typeof window & { capturedEvents: unknown[][] }).capturedEvents,
+    ...((window.dataLayer ?? []).map((event) =>
+      Array.from(event as ArrayLike<unknown>),
+    )),
+  ]);
+  expect(
+    events.filter(
+      (event) => event[0] === "event" && event[1] === "sample_download",
+    ),
+  ).toHaveLength(1);
 });
 
 test("analytics is a no-op after rejection", async ({ page }) => {

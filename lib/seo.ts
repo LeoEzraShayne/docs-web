@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { DocumentType } from "./types";
 
 export const siteUrl = "https://docs.meritledger.org";
 export const siteName = "Docs";
@@ -15,19 +16,21 @@ export type FaqItem = {
 
 export type SeoLandingPage = {
   slug: string;
+  documentType: DocumentType;
   kicker: string;
   title: string;
   description: string;
   intro: string;
   useCases: string[];
   inputs: string[];
-  outputs: string[];
+  reviewPoints: string[];
   faq: FaqItem[];
 };
 
 export const landingPages: SeoLandingPage[] = [
   {
     slug: "/requirements-definition-ai",
+    documentType: "REQUIREMENTS",
     kicker: "Requirements Definition AI",
     title: "要件定義書AI生成 | 議事録からExcel要件定義書を自動作成",
     description:
@@ -44,10 +47,10 @@ export const landingPages: SeoLandingPage[] = [
       "対象範囲、対象外範囲、前提条件",
       "会議メモ、利用者ロール、制約条件",
     ],
-    outputs: [
-      "業務フロー、画面、機能要件の整理",
-      "非機能要件、リスク、用語集の整理",
-      "Excel出力、再生成、履歴管理",
+    reviewPoints: [
+      "入力情報に根拠があるか、未確定事項を断定していないか",
+      "対象範囲、機能、非機能、リスクに抜け漏れがないか",
+      "Excel出力後に関係者が内容を確認し合意できるか",
     ],
     faq: [
       {
@@ -63,12 +66,13 @@ export const landingPages: SeoLandingPage[] = [
       {
         question: "日本の開発現場向けの項目に対応していますか？",
         answer:
-          "目的、スコープ、機能要件、非機能要件、リスク、用語など、日本の受託開発や社内開発で使われやすい項目を意識しています。",
+          "正式な12シートで、項目概要、スコープ、業務・機能要件、画面、権限、データ、外部連携、非機能、業務フロー、課題・リスクを整理します。",
       },
     ],
   },
   {
     slug: "/basic-design-ai",
+    documentType: "BASIC_DESIGN",
     kicker: "Basic Design AI",
     title: "基本設計書AI生成 | 機能・画面・フローをExcelで自動整理",
     description:
@@ -85,7 +89,7 @@ export const landingPages: SeoLandingPage[] = [
       "機能一覧、利用者ロール、制約条件",
       "外部連携、入出力、非機能要件のメモ",
     ],
-    outputs: [
+    reviewPoints: [
       "画面、機能、業務フローの整理",
       "インターフェースと非機能要件の観点整理",
       "Excel出力、再生成、履歴管理",
@@ -110,6 +114,7 @@ export const landingPages: SeoLandingPage[] = [
   },
   {
     slug: "/detailed-design-ai",
+    documentType: "DETAILED_DESIGN",
     kicker: "Detailed Design AI",
     title: "詳細設計書AI生成 | 処理ロジックと実装観点を自動整理",
     description:
@@ -126,7 +131,7 @@ export const landingPages: SeoLandingPage[] = [
       "処理条件、データ項目、外部連携のメモ",
       "制約、例外処理、未決事項",
     ],
-    outputs: [
+    reviewPoints: [
       "処理単位、条件分岐、例外系の整理",
       "項目定義、確認事項、リスクの整理",
       "Excel出力、再生成、履歴管理",
@@ -151,6 +156,7 @@ export const landingPages: SeoLandingPage[] = [
   },
   {
     slug: "/unit-test-spec-ai",
+    documentType: "UNIT_TEST",
     kicker: "Unit Test Spec AI",
     title: "単体テスト仕様書AI生成 | テスト項目と期待結果を自動作成",
     description:
@@ -167,7 +173,7 @@ export const landingPages: SeoLandingPage[] = [
       "入力項目、バリデーション、例外条件",
       "確認したい観点や制約",
     ],
-    outputs: [
+    reviewPoints: [
       "テスト条件、入力値、期待結果の整理",
       "正常系、異常系、境界値の観点整理",
       "Excel出力、再生成、履歴管理",
@@ -192,6 +198,7 @@ export const landingPages: SeoLandingPage[] = [
   },
   {
     slug: "/integration-test-spec-ai",
+    documentType: "INTEGRATION_TEST",
     kicker: "Integration Test Spec AI",
     title: "結合テスト仕様書AI生成 | 連携・業務フローのテスト観点を整理",
     description:
@@ -208,7 +215,7 @@ export const landingPages: SeoLandingPage[] = [
       "外部連携、API、データ入出力のメモ",
       "異常時の扱い、確認したい業務シナリオ",
     ],
-    outputs: [
+    reviewPoints: [
       "業務シナリオ、連携条件、期待結果の整理",
       "システム間連携とデータ確認の観点整理",
       "Excel出力、再生成、履歴管理",
@@ -244,7 +251,7 @@ export const requirementsDefinitionTemplatePage = {
   slug: "/requirements-definition-template",
   title: "要件定義書テンプレート｜無料で見られるExcel構成・記入例付き",
   description:
-    "システム開発で使える要件定義書テンプレートの構成例を無料で確認できます。基本情報、業務要件、機能要件、非機能要件、画面一覧、帳票一覧、制約事項まで、記入例付きで解説します。",
+    "システム開発で使える要件定義書テンプレートを無料でダウンロード。製品と共通の正式12シートに、レビュー用チェックリストと記入例を加えた全14シートです。",
 };
 
 export const meetingNotesToRequirementsPage = {

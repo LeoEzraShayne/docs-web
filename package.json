@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "sync:document-catalog": "node scripts/sync-document-catalog.mjs",
+    "check:document-catalog": "node scripts/sync-document-catalog.mjs --check",
+    "build:requirements-assets": "node scripts/build-requirements-assets.mjs",
+    "verify:requirements-assets": "node scripts/verify-requirements-assets.mjs"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

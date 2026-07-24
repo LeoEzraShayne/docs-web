@@ -1,0 +1,500 @@
+{
+  "contractVersion": 1,
+  "contractHash": "0185093e3dc6e511a2392862984c4220d2ba7e5e2e954916cb1f1be416e45795",
+  "documents": {
+    "BASIC_DESIGN": {
+      "title": "基本設計書",
+      "filename": "基本設計書.xlsx",
+      "sources": [
+        "REQUIREMENTS_VERSION",
+        "DIRECT_INPUT"
+      ],
+      "modes": [
+        "standard",
+        "custom"
+      ],
+      "simpleSheets": [],
+      "sheets": [
+        {
+          "name": "基本設計概要",
+          "workbookName": "基本設計概要",
+          "columns": [
+            "No",
+            "項目",
+            "内容"
+          ]
+        },
+        {
+          "name": "システム構成設計",
+          "workbookName": "システム構成設計",
+          "columns": [
+            "No",
+            "論理名",
+            "物理名",
+            "種別",
+            "主な役割",
+            "入力",
+            "出力",
+            "備考"
+          ]
+        },
+        {
+          "name": "画面遷移一覧",
+          "workbookName": "画面遷移一覧",
+          "columns": [
+            "No",
+            "現在画面",
+            "操作",
+            "遷移先画面"
+          ]
+        },
+        {
+          "name": "画面設計",
+          "workbookName": "画面設計",
+          "columns": [
+            "No",
+            "画面名",
+            "画面ID",
+            "画面目的",
+            "主な機能"
+          ]
+        },
+        {
+          "name": "機能設計",
+          "workbookName": "機能設計",
+          "columns": [
+            "No",
+            "機能名",
+            "機能ID",
+            "機能説明",
+            "入力",
+            "出力"
+          ]
+        },
+        {
+          "name": "API設計",
+          "workbookName": "API設計",
+          "columns": [
+            "No",
+            "API名",
+            "API ID",
+            "URL",
+            "Method",
+            "機能概要",
+            "リクエスト概要",
+            "レスポンス概要"
+          ]
+        },
+        {
+          "name": "データベース設計",
+          "workbookName": "データベース設計",
+          "columns": [
+            "No",
+            "テーブル論理名",
+            "テーブル物理名",
+            "目的",
+            "主な項目",
+            "主キー"
+          ]
+        },
+        {
+          "name": "権限設計",
+          "workbookName": "権限設計",
+          "columns": [
+            "No",
+            "ロール名",
+            "対象機能",
+            "参照",
+            "更新",
+            "削除",
+            "備考"
+          ]
+        },
+        {
+          "name": "バッチ・帳票設計",
+          "workbookName": "バッチ・帳票設計",
+          "columns": [
+            "No",
+            "名称",
+            "種別",
+            "実行タイミング",
+            "機能概要"
+          ]
+        },
+        {
+          "name": "非機能設計",
+          "workbookName": "非機能設計",
+          "columns": [
+            "No",
+            "分類",
+            "要件",
+            "説明"
+          ]
+        }
+      ]
+    },
+    "DETAILED_DESIGN": {
+      "title": "詳細設計書",
+      "filename": "詳細設計書.xlsx",
+      "sources": [
+        "BASIC_DESIGN_VERSION",
+        "DIRECT_INPUT"
+      ],
+      "modes": [
+        "standard",
+        "custom"
+      ],
+      "simpleSheets": [],
+      "sheets": [
+        {
+          "name": "テーブル詳細設計",
+          "workbookName": "テーブル詳細設計",
+          "columns": [
+            "No",
+            "テーブル論理名",
+            "テーブル物理名",
+            "用途",
+            "主な処理",
+            "備考"
+          ]
+        },
+        {
+          "name": "テーブル項目定義",
+          "workbookName": "テーブル項目定義",
+          "columns": [
+            "No",
+            "テーブル論理名",
+            "テーブル物理名",
+            "項目論理名",
+            "項目物理名",
+            "データ型",
+            "必須",
+            "説明"
+          ]
+        },
+        {
+          "name": "API項目定義",
+          "workbookName": "API項目定義",
+          "columns": [
+            "No",
+            "API ID",
+            "区分",
+            "項目論理名",
+            "項目物理名",
+            "データ型",
+            "必須",
+            "説明",
+            "サンプル値"
+          ]
+        },
+        {
+          "name": "API詳細設計",
+          "workbookName": "API詳細設計",
+          "columns": [
+            "No",
+            "API名",
+            "API ID",
+            "URL",
+            "Method",
+            "Request JSON",
+            "Response JSON",
+            "処理概要"
+          ]
+        },
+        {
+          "name": "画面項目設計",
+          "workbookName": "画面項目設計",
+          "columns": [
+            "No",
+            "画面名",
+            "画面ID",
+            "項目論理名",
+            "項目物理名",
+            "項目種別",
+            "必須",
+            "活性条件",
+            "説明"
+          ]
+        },
+        {
+          "name": "入力チェック設計",
+          "workbookName": "入力チェック設計",
+          "columns": [
+            "No",
+            "画面名",
+            "項目論理名",
+            "項目物理名",
+            "チェック内容",
+            "エラーメッセージ"
+          ]
+        },
+        {
+          "name": "画面処理設計",
+          "workbookName": "画面処理設計",
+          "columns": [
+            "No",
+            "画面名",
+            "操作",
+            "処理内容",
+            "呼出API"
+          ]
+        },
+        {
+          "name": "エラー設計",
+          "workbookName": "エラー設計",
+          "columns": [
+            "No",
+            "エラーコード",
+            "エラー名",
+            "エラー内容",
+            "処理方法"
+          ]
+        },
+        {
+          "name": "メッセージ設計",
+          "workbookName": "メッセージ設計",
+          "columns": [
+            "No",
+            "メッセージID",
+            "メッセージ内容",
+            "表示タイミング"
+          ]
+        }
+      ]
+    },
+    "INTEGRATION_TEST": {
+      "title": "結合テスト仕様書",
+      "filename": "結合テスト仕様書.xlsx",
+      "sources": [
+        "DETAILED_DESIGN_VERSION",
+        "PASTED_DESIGN"
+      ],
+      "modes": [
+        "standard",
+        "custom"
+      ],
+      "simpleSheets": [],
+      "sheets": [
+        {
+          "name": "業務シナリオテスト",
+          "workbookName": "業務シナリオテスト",
+          "columns": [
+            "No",
+            "シナリオ名",
+            "関連機能",
+            "前提条件",
+            "テスト手順",
+            "期待結果",
+            "実施者",
+            "実施日",
+            "備考"
+          ]
+        }
+      ]
+    },
+    "REQUIREMENTS": {
+      "title": "要件定義書",
+      "filename": "要件定義書.xlsx",
+      "sources": [
+        "PROJECT",
+        "DIRECT_INPUT"
+      ],
+      "modes": [
+        "standard",
+        "simple",
+        "custom"
+      ],
+      "simpleSheets": [
+        "項目概要",
+        "機能要件一覧",
+        "画面一覧",
+        "データ項目定義",
+        "業務フロー"
+      ],
+      "sheets": [
+        {
+          "name": "項目概要",
+          "workbookName": "項目概要",
+          "columns": [
+            "No",
+            "項目",
+            "内容"
+          ]
+        },
+        {
+          "name": "スコープ定義",
+          "workbookName": "スコープ定義",
+          "columns": [
+            "No",
+            "区分",
+            "対象",
+            "説明"
+          ]
+        },
+        {
+          "name": "業務要件",
+          "workbookName": "業務要件",
+          "columns": [
+            "No",
+            "業務",
+            "課題",
+            "要件"
+          ]
+        },
+        {
+          "name": "機能要件一覧",
+          "workbookName": "機能要件一覧",
+          "columns": [
+            "No",
+            "機能名",
+            "目的",
+            "概要",
+            "優先度"
+          ]
+        },
+        {
+          "name": "画面一覧",
+          "workbookName": "画面一覧",
+          "columns": [
+            "No",
+            "画面ID",
+            "画面名",
+            "目的",
+            "主な機能"
+          ]
+        },
+        {
+          "name": "画面概要",
+          "workbookName": "画面概要",
+          "columns": [
+            "No",
+            "画面名",
+            "利用者",
+            "概要"
+          ]
+        },
+        {
+          "name": "権限一覧",
+          "workbookName": "権限一覧",
+          "columns": [
+            "No",
+            "ロール名",
+            "利用可能機能"
+          ]
+        },
+        {
+          "name": "データ項目定義",
+          "workbookName": "データ項目定義",
+          "columns": [
+            "No",
+            "エンティティ名",
+            "目的",
+            "主なデータ項目"
+          ]
+        },
+        {
+          "name": "外部連携/API一覧",
+          "workbookName": "外部連携・API一覧",
+          "columns": [
+            "No",
+            "API名",
+            "目的",
+            "呼出元",
+            "呼出先",
+            "業務説明"
+          ]
+        },
+        {
+          "name": "非機能要件",
+          "workbookName": "非機能要件",
+          "columns": [
+            "No",
+            "分類",
+            "要件",
+            "説明"
+          ]
+        },
+        {
+          "name": "業務フロー",
+          "workbookName": "業務フロー",
+          "columns": [
+            "No",
+            "ステップ",
+            "担当",
+            "内容"
+          ]
+        },
+        {
+          "name": "課題・リスク一覧",
+          "workbookName": "課題・リスク一覧",
+          "columns": [
+            "No",
+            "分類",
+            "内容",
+            "影響"
+          ]
+        }
+      ]
+    },
+    "UNIT_TEST": {
+      "title": "単体テスト仕様書",
+      "filename": "単体テスト仕様書.xlsx",
+      "sources": [
+        "DETAILED_DESIGN_VERSION",
+        "DIRECT_INPUT"
+      ],
+      "modes": [
+        "standard",
+        "custom"
+      ],
+      "simpleSheets": [],
+      "sheets": [
+        {
+          "name": "画面テスト",
+          "workbookName": "画面テスト",
+          "columns": [
+            "No",
+            "画面ID",
+            "テスト項目",
+            "前提条件",
+            "テスト手順",
+            "期待結果",
+            "実施者",
+            "実施日",
+            "備考"
+          ]
+        },
+        {
+          "name": "APIテスト",
+          "workbookName": "APIテスト",
+          "columns": [
+            "No",
+            "API ID",
+            "テスト項目",
+            "前提条件",
+            "テスト手順",
+            "期待結果",
+            "実施者",
+            "実施日",
+            "備考"
+          ]
+        },
+        {
+          "name": "DBテスト",
+          "workbookName": "DBテスト",
+          "columns": [
+            "No",
+            "テーブル名",
+            "テスト項目",
+            "前提条件",
+            "テスト手順",
+            "期待結果",
+            "実施者",
+            "実施日",
+            "備考"
+          ]
+        }
+      ]
+    }
+  }
+}

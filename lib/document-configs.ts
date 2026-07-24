@@ -5,10 +5,11 @@ import {
   type DocumentFieldConfig,
 } from "./document-field-configs";
 import { documentSheets, simpleDocumentSheets } from "./document-sheet-configs";
+import { getDocumentContract, type GenerationMode } from "./document-catalog";
 
 export type { DocumentFieldConfig } from "./document-field-configs";
 
-export type GenerationMode = "standard" | "simple" | "custom";
+export type { GenerationMode } from "./document-catalog";
 
 export type DocumentPageConfig = {
   type: DocumentType;
@@ -23,20 +24,23 @@ export type DocumentPageConfig = {
 };
 
 export const DOCUMENT_PAGE_CONFIGS: Record<DocumentType, DocumentPageConfig> = {
-  REQUIREMENTS: page("REQUIREMENTS", ["standard", "simple", "custom"]),
-  BASIC_DESIGN: page("BASIC_DESIGN", ["standard", "custom"]),
-  DETAILED_DESIGN: page("DETAILED_DESIGN", ["standard", "custom"]),
-  UNIT_TEST: page("UNIT_TEST", ["standard", "custom"]),
-  INTEGRATION_TEST: page("INTEGRATION_TEST", ["standard", "custom"]),
+  REQUIREMENTS: page("REQUIREMENTS"),
+  BASIC_DESIGN: page("BASIC_DESIGN"),
+  DETAILED_DESIGN: page("DETAILED_DESIGN"),
+  UNIT_TEST: page("UNIT_TEST"),
+  INTEGRATION_TEST: page("INTEGRATION_TEST"),
 };
 
-function page(type: DocumentType, modes: GenerationMode[]): DocumentPageConfig {
+function page(type: DocumentType): DocumentPageConfig {
   const copy = documentPageCopy[type];
+  const contract = getDocumentContract(type);
   return {
     type,
-    title: copy.title,
-    sourceOptions: copy.sourceOptions,
-    modes,
+    title: contract.title,
+    sourceOptions: copy.sourceOptions.filter((option) =>
+      contract.sources.includes(option.value),
+    ),
+    modes: contract.modes,
     fields: documentFields[type],
     sheets: documentSheets[type],
     simpleSheets: simpleDocumentSheets[type],

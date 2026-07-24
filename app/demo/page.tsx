@@ -10,26 +10,23 @@ import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { GenerateResponse } from "@/lib/types";
 import { trackAnalyticsEvent } from "@/lib/analytics";
-
-const demoTabs = [
-  { key: "flow", label: "FLOW" },
-  { key: "screens", label: "SCREENS" },
-  { key: "functions", label: "FUNCTIONS" },
-  { key: "nfr", label: "NFR" },
-  { key: "risks_issues", label: "RISKS" },
-  { key: "glossary", label: "GLOSSARY" },
-];
+import { previewTabDefinitions, resolvePreviewSchema } from "@/lib/preview-schema";
 
 const DEMO_PREVIEW_CACHE_KEY = "docs-demo-preview";
 
 export default function DemoPage() {
   const { status } = useAuth();
   const [data, setData] = useState<GenerateResponse | null>(null);
-  const [activeTab, setActiveTab] = useState("flow");
+  const [activeTab, setActiveTab] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const createHref =
     status === "authenticated" ? "/app/new" : "/login?next=/app/new";
+  const schema = data ? resolvePreviewSchema(data.schema, data.tabs) : null;
+  const tabDefinitions = data
+    ? previewTabDefinitions(data.schema, data.tabs)
+    : [];
+  const selectedTab = activeTab || tabDefinitions[0]?.key || "";
 
   useEffect(() => {
     async function run() {
@@ -91,12 +88,22 @@ export default function DemoPage() {
 
       {data ? (
         <Card className="rounded-2xl p-6">
-          <Tabs tabs={demoTabs} active={activeTab} onChange={setActiveTab} />
+          {schema === "legacy-v1" ? (
+            <div className="mb-4 rounded-lg border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+              このキャッシュは旧形式です。再読み込み後の新しいデモでは正式12シートを表示します。
+            </div>
+          ) : (
+            <div className="mb-4 rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+              正式な要件定義書12シートを表示しています。各シートは最大5行で、一部セルを制限表示します。
+            </div>
+          )}
+          <Tabs
+            tabs={tabDefinitions}
+            active={selectedTab}
+            onChange={setActiveTab}
+          />
           <div className="mt-6">
-            <DataTable
-              rows={data.tabs[activeTab as keyof typeof data.tabs]}
-              preview
-            />
+            <DataTable rows={data.tabs[selectedTab] ?? []} preview />
           </div>
         </Card>
       ) : loading ? (

@@ -2,8 +2,17 @@ import { Card } from "@/components/card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackedLink } from "@/components/seo/tracked-link";
 import { faqJsonLd, type SeoLandingPage } from "@/lib/seo";
+import { getDocumentContract } from "@/lib/document-catalog";
 
 export function SeoLandingPage({ page }: { page: SeoLandingPage }) {
+  const contract = getDocumentContract(page.documentType);
+  const modeLabels = contract.modes.map((mode) =>
+    mode === "standard"
+      ? "標準版"
+      : mode === "simple"
+        ? "簡易版"
+        : "カスタム版",
+  );
   return (
     <div className="space-y-8 py-8">
       <JsonLd data={faqJsonLd(page.faq)} />
@@ -27,8 +36,45 @@ export function SeoLandingPage({ page }: { page: SeoLandingPage }) {
       <section className="grid gap-4 lg:grid-cols-3">
         <InfoCard title="適用シーン" items={page.useCases} />
         <InfoCard title="入力する情報" items={page.inputs} />
-        <InfoCard title="生成される成果物" items={page.outputs} />
+        <InfoCard
+          title="確認観点（生成シートではありません）"
+          items={page.reviewPoints}
+        />
       </section>
+
+      <Card className="rounded-2xl p-8">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300">
+              Product document contract v1
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-slate-50">
+              製品が生成する正式{contract.sheets.length}シート
+            </h2>
+          </div>
+          <p className="text-sm text-slate-400">
+            生成モード：{modeLabels.join("・")}
+          </p>
+        </div>
+        <p className="mt-4 text-sm leading-7 text-slate-300">
+          以下は実際のExcel出力と同じシート名・列順です。入力情報が不足しているセルは空欄になるため、生成後のレビューが必要です。
+        </p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {contract.sheets.map((sheet, index) => (
+            <section
+              key={sheet.name}
+              className="rounded-xl border border-slate-800 bg-slate-950/40 p-4"
+            >
+              <h3 className="font-semibold text-slate-100">
+                {index + 1}. {sheet.workbookName}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                列：{sheet.columns.join(" / ")}
+              </p>
+            </section>
+          ))}
+        </div>
+      </Card>
 
       <Card className="rounded-2xl p-8">
         <h2 className="text-2xl font-bold text-slate-50">よくある質問</h2>

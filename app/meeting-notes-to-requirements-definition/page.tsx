@@ -19,12 +19,12 @@ const meetingMemo = [
 ];
 
 const conversionRows = [
-  ["背景", "受注情報が複数のExcelに分散し、最新版の確認に時間がかかっている"],
-  ["目的", "見積、受注、請求の情報を一元管理し、確認作業を減らす"],
-  ["対象範囲", "見積作成、受注登録、請求書発行、CSV出力"],
-  ["機能要件", "受注一覧、受注詳細、請求書発行、権限別表示"],
-  ["非機能要件", "主要画面は3秒以内に表示し、営業担当と経理担当の権限を分離する"],
-  ["制約条件", "既存の顧客コード体系を維持し、初期連携はCSV出力とする"],
+  ["Excelが分散し最新版が不明", "項目概要", "項目 / 内容", "背景：最新版確認に時間がかかっている"],
+  ["見積・受注・請求を同じ画面で確認", "業務要件", "業務 / 課題 / 要件", "受注・請求情報を一元管理する"],
+  ["初期連携はCSVでよい", "外部連携・API一覧", "API名 / 目的 / 呼出元 / 呼出先 / 業務説明", "会計システムへ日次CSVを出力する"],
+  ["既存顧客コード体系を使用", "スコープ定義", "区分 / 対象 / 説明", "制約として既存コード体系を維持する"],
+  ["営業と経理で見える項目を分離", "権限一覧", "ロール名 / 利用可能機能", "営業担当と経理担当の参照範囲を分ける"],
+  ["再処理担当は未決", "課題・リスク一覧", "分類 / 内容 / 影響", "CSVエラー時の担当と期限を確認する"],
 ];
 
 const steps = [
@@ -119,17 +119,19 @@ export default function MeetingNotesToRequirementsDefinitionPage() {
           <table className="min-w-[720px] text-left text-sm">
             <thead className="border-b border-slate-800 text-slate-400">
               <tr>
-                <th className="py-3 pr-4 font-semibold">要件定義書の項目</th>
+                <th className="py-3 pr-4 font-semibold">会議メモの原始情報</th>
+                <th className="py-3 pr-4 font-semibold">対象シート</th>
+                <th className="py-3 pr-4 font-semibold">対象列</th>
                 <th className="py-3 font-semibold">整理後の記入例</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-slate-300">
-              {conversionRows.map(([label, value]) => (
-                <tr key={label}>
-                  <td className="py-4 pr-4 font-medium text-slate-100">
-                    {label}
-                  </td>
-                  <td className="py-4 leading-7">{value}</td>
+              {conversionRows.map(([source, sheet, columns, example]) => (
+                <tr key={source}>
+                  <td className="py-4 pr-4 font-medium text-slate-100">{source}</td>
+                  <td className="py-4 pr-4 text-amber-100">{sheet}</td>
+                  <td className="py-4 pr-4 leading-7">{columns}</td>
+                  <td className="py-4 leading-7">{example}</td>
                 </tr>
               ))}
             </tbody>

@@ -12,21 +12,13 @@ import { Tabs } from "@/components/tabs";
 import { api, formatApiError } from "@/lib/api";
 import { formatCount } from "@/lib/format-number";
 import type { GenerateResponse, ProjectVersionResponse } from "@/lib/types";
-
-const previewTabs = [
-  { key: "flow", label: "FLOW" },
-  { key: "screens", label: "SCREENS" },
-  { key: "functions", label: "FUNCTIONS" },
-  { key: "nfr", label: "NFR" },
-  { key: "risks_issues", label: "RISKS" },
-  { key: "glossary", label: "GLOSSARY" },
-];
+import { previewTabDefinitions, resolvePreviewSchema } from "@/lib/preview-schema";
 
 function ProjectPreviewPageContent() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const versionNo = Number(searchParams.get("ver") ?? "0");
-  const [activeTab, setActiveTab] = useState("flow");
+  const [activeTab, setActiveTab] = useState("");
   const [data, setData] = useState<
     GenerateResponse | ProjectVersionResponse | null
   >(null);
@@ -61,6 +53,9 @@ function ProjectPreviewPageContent() {
   }
 
   const tabs = data.tabs;
+  const schema = resolvePreviewSchema(data.schema, tabs);
+  const tabDefinitions = previewTabDefinitions(data.schema, tabs);
+  const selectedTab = activeTab || tabDefinitions[0].key;
   const paywall =
     "paywall" in data
       ? data.paywall
@@ -129,12 +124,13 @@ function ProjectPreviewPageContent() {
 
       <Card className="rounded-2xl p-6">
         <div className="mb-4 rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          プレビューは制限表示です。FUNCTIONS / NFR / RISKS
-          では高価値カラムを隠し、最大 5 行まで表示します。
+          {schema === "legacy-v1"
+            ? "旧形式バージョンです。保存済みの6タブをそのまま表示し、従来の方法でExcelをダウンロードできます。"
+            : "正式な要件定義書12シートのプレビューです。列構造を保ったまま最大5行を表示し、一部セルは「正式生成後に表示」となります。"}
         </div>
-        <Tabs tabs={previewTabs} active={activeTab} onChange={setActiveTab} />
+        <Tabs tabs={tabDefinitions} active={selectedTab} onChange={setActiveTab} />
         <div className="mt-6">
-          <DataTable rows={tabs[activeTab as keyof typeof tabs]} preview />
+          <DataTable rows={tabs[selectedTab] ?? []} preview />
         </div>
         {message ? (
           <p className="mt-4 text-sm text-orange-300">{message}</p>

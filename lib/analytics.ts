@@ -52,6 +52,7 @@ export function disableAnalytics() {
 
 export type AnalyticsEventName =
   | "template_download"
+  | "sample_download"
   | "checklist_copy"
   | "checklist_export"
   | "seo_demo_click"

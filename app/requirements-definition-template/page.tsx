@@ -4,6 +4,7 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackedLink } from "@/components/seo/tracked-link";
+import { getDocumentContract } from "@/lib/document-catalog";
 import {
   articleJsonLd,
   breadcrumbJsonLd,
@@ -12,14 +13,14 @@ import {
   requirementsDefinitionTemplatePage,
 } from "@/lib/seo";
 
+const contract = getDocumentContract("REQUIREMENTS");
 const sections = [
-  ["基本情報", "プロジェクト名、作成日、作成者、対象システム、関係者"],
-  ["背景・目的", "現状課題、導入目的、期待する業務上の効果"],
-  ["スコープ", "対象範囲、対象外範囲、前提条件、制約条件"],
-  ["業務要件", "対象業務、利用者、業務フロー、運用ルール"],
-  ["機能要件", "機能一覧、画面一覧、帳票一覧、外部連携"],
-  ["非機能要件", "性能、可用性、セキュリティ、保守性、移行"],
-  ["リスク・未決事項", "確認待ち事項、依存関係、判断が必要な項目"],
+  ["背景・目的 → 項目概要", "現状課題、導入目的、期待する業務上の効果は「項目概要」に記録します。"],
+  ["制約 → スコープ定義", "対象範囲、対象外範囲、前提条件、業務・技術上の制約は「スコープ定義」に整理します。"],
+  ["業務・機能", "業務要件、機能要件一覧、画面一覧、画面概要、権限一覧へ分けます。"],
+  ["データ・連携", "データ項目定義と外部連携・API一覧に、対象データとシステム間の受け渡しを記録します。"],
+  ["品質・流れ", "非機能要件と業務フローに、品質条件と担当ごとの処理順を記録します。"],
+  ["未決事項 → 課題・リスク一覧", "確認待ち、依存関係、判断が必要な項目は「課題・リスク一覧」に残します。"],
 ];
 
 const sampleRows = [
@@ -89,7 +90,7 @@ export default function RequirementsDefinitionTemplatePage() {
           要件定義書テンプレート｜無料で見られるExcel構成・記入例付き
         </h1>
         <p className="mt-5 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">
-          システム開発で使う要件定義書の構成例を、Excelで整理しやすい粒度でまとめています。基本情報、業務要件、機能要件、非機能要件、画面一覧、帳票一覧、制約事項まで、記入例とあわせて確認できます。
+          製品が生成する正式12シートと同じ構造を、Excelで無料提供しています。空欄から記入できる正式12シートに、レビュー用チェックリストと架空の記入例を加えた全14シートです。
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <TrackedLink
@@ -115,7 +116,7 @@ export default function RequirementsDefinitionTemplatePage() {
           無料Excelテンプレートの内容
         </h2>
         <p className="mt-4 text-sm leading-7 text-slate-300">
-          製品が生成する12シートに、レビュー・チェックリストと記入例を加えた全14シートを収録しています。案件に不要な項目は理由を残して対象外とし、生成物をそのまま承認せず関係者でレビューしてください。
+          前半12シートは製品が生成する正式構造、13番目はレビュー・チェックリスト、14番目は架空の記入例です。追加2シートは無料テンプレート限定の補助資料で、製品の生成結果には含まれません。案件に不要な項目は理由を残して対象外とし、生成物をそのまま承認せず関係者でレビューしてください。
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <TrackedLink
@@ -178,10 +179,11 @@ export default function RequirementsDefinitionTemplatePage() {
           </h2>
           <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-300">
             {[
-              "1. 項目概要", "2. スコープ定義", "3. 業務要件", "4. 機能要件一覧",
-              "5. 画面一覧", "6. 画面概要", "7. 権限一覧", "8. データ項目定義",
-              "9. 外部連携・API一覧", "10. 非機能要件", "11. 業務フロー", "12. 課題・リスク一覧",
-              "13. レビュー・チェックリスト", "14. 記入例",
+              ...contract.sheets.map(
+                (sheet, index) => `${index + 1}. ${sheet.workbookName}`,
+              ),
+              "13. レビュー・チェックリスト（無料テンプレート附属）",
+              "14. 記入例（無料テンプレート附属）",
             ].map((item) => (
               <li key={item} className="border-l border-amber-300/40 pl-3">
                 {item}

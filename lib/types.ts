@@ -106,7 +106,7 @@ export type ProjectDetail = {
   }>;
 };
 
-export type GenerateTabs = {
+export type LegacyGenerateTabs = {
   flow: Array<Record<string, unknown>>;
   screens: Array<Record<string, unknown>>;
   functions: Array<Record<string, unknown>>;
@@ -115,12 +115,16 @@ export type GenerateTabs = {
   glossary: Array<Record<string, unknown>>;
 };
 
+export type PreviewSchema = "requirements-v2" | "legacy-v1";
+export type GenerateTabs = Record<string, Array<Record<string, unknown>>>;
+
 export type GenerateResponse = {
   project: {
     id: string;
     docTitle: string;
   };
   versionNo: number;
+  schema?: PreviewSchema;
   tabs: GenerateTabs;
   paywall: {
     canExport: boolean;
@@ -135,6 +139,7 @@ export type ProjectVersionResponse = {
   };
   versionNo: number;
   quality: string;
+  schema?: PreviewSchema;
   tabs: GenerateTabs;
 };
 
