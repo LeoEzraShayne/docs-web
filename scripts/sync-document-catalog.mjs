@@ -11,9 +11,18 @@ const catalogUrl = urlArgument
   : process.env.DOCUMENT_CATALOG_URL ??
     `${baseUrl.replace(/\/$/, "")}/document-catalog/v1`;
 
-const response = await fetch(catalogUrl, { headers: { Accept: "application/json" } });
+const response = await fetch(catalogUrl, {
+  headers: {
+    Accept: "application/json",
+    "User-Agent":
+      "Mozilla/5.0 (compatible; DocsDocumentCatalogMonitor/1.0; +https://docs.meritledger.org)",
+  },
+});
 if (!response.ok) {
-  throw new Error(`Document catalog request failed: ${response.status} ${catalogUrl}`);
+  const errorBody = await response.text().catch(() => "");
+  throw new Error(
+    `Document catalog request failed: ${response.status} ${catalogUrl} ${errorBody.slice(0, 240)}`,
+  );
 }
 
 const catalog = await response.json();
