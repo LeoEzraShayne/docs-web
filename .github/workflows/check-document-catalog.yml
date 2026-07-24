@@ -17,5 +17,5 @@ jobs:
       - run: npm ci
       - name: Compare production contract with snapshot
         env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          DOCUMENT_CATALOG_URL: https://api-docs.meritledger.org/document-catalog/v1
         run: npm run check:document-catalog

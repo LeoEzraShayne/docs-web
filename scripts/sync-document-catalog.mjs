@@ -5,7 +5,7 @@ const snapshotPath = path.resolve("lib/generated/document-catalog.v1.json");
 const checkOnly = process.argv.includes("--check");
 const urlArgument = process.argv.find((argument) => argument.startsWith("--url="));
 const baseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api-docs.meritledger.org";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-docs.meritledger.org";
 const catalogUrl = urlArgument
   ? urlArgument.slice("--url=".length)
   : process.env.DOCUMENT_CATALOG_URL ??
